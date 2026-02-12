@@ -1,14 +1,30 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import Navigation from "@/components/Navigation";
+import HeroSection from "@/components/HeroSection";
+import DatasetLab from "@/components/DatasetLab";
+import QuantumSimPanel from "@/components/QuantumSimPanel";
+import MLBenchmark from "@/components/MLBenchmark";
+import ComparisonDashboard from "@/components/ComparisonDashboard";
+import LiveTesting from "@/components/LiveTesting";
+import ErrorAnalysis from "@/components/ErrorAnalysis";
+import AdminControls from "@/components/AdminControls";
 
-const Index = () => {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
-  );
-};
+const Index = () => (
+  <div className="min-h-screen bg-background text-foreground">
+    <Navigation />
+    <HeroSection />
+    <DatasetLab />
+    <QuantumSimPanel />
+    <MLBenchmark />
+    <ComparisonDashboard />
+    <LiveTesting />
+    <ErrorAnalysis />
+    <AdminControls />
+    <footer className="border-t border-border/30 py-8 text-center">
+      <p className="font-mono text-xs text-muted-foreground">
+        QuantaCure © 2024–2025 · Quantum Pharma Lab · All rights reserved
+      </p>
+    </footer>
+  </div>
+);
 
 export default Index;
