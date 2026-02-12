@@ -3,11 +3,11 @@ import MoleculeCanvas from "./MoleculeCanvas";
 import { Atom, FlaskConical, Cpu, Calendar, GraduationCap, Users } from "lucide-react";
 
 const stats = [
-  { icon: Users, label: "Research Team", value: "Quantum Pharma Lab" },
-  { icon: GraduationCap, label: "Supervisor", value: "Dr. A. Rahman" },
-  { icon: Cpu, label: "University", value: "Institute of Technology" },
-  { icon: Calendar, label: "Timeline", value: "2024–2025" },
-  { icon: FlaskConical, label: "Publication Target", value: "Nature Comp. Sci." },
+  { icon: Users, label: "Research Team", value: "Muhammad Samiullah, Muhammad Danish Nadeem, Safwaan Saleem" },
+  { icon: GraduationCap, label: "Supervisor", value: "Sier Zunnurain" },
+  { icon: Cpu, label: "University", value: "Bahria University Lahore Campus" },
+  { icon: Calendar, label: "Timeline", value: "2025–2026" },
+  { icon: FlaskConical, label: "Publication Target", value: "Quantum Computation" },
 ];
 
 const HeroSection = () => (
