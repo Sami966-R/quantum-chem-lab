@@ -3,7 +3,15 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import Landing from "./pages/Landing";
+import Overview from "./pages/Overview";
+import DatasetPage from "./pages/DatasetPage";
+import BenchmarkPage from "./pages/BenchmarkPage";
+import ResultsPage from "./pages/ResultsPage";
+import MoleculeTestingPage from "./pages/MoleculeTestingPage";
+import ErrorAnalysisPage from "./pages/ErrorAnalysisPage";
+import QuantumPage from "./pages/QuantumPage";
+import TeamPage from "./pages/TeamPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -15,8 +23,15 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/" element={<Landing />} />
+          <Route path="/overview" element={<Overview />} />
+          <Route path="/datasets" element={<DatasetPage />} />
+          <Route path="/benchmark" element={<BenchmarkPage />} />
+          <Route path="/results" element={<ResultsPage />} />
+          <Route path="/molecule-testing" element={<MoleculeTestingPage />} />
+          <Route path="/error-analysis" element={<ErrorAnalysisPage />} />
+          <Route path="/quantum" element={<QuantumPage />} />
+          <Route path="/team" element={<TeamPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
