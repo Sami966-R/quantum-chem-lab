@@ -54,19 +54,46 @@ const DatasetLab = () => {
           <p className="mt-2 text-sm text-muted-foreground">ChEMBL & QM7 datasets · Interactive exploration & visualization</p>
         </motion.div>
 
-        {/* Tabs */}
-        <div className="mb-6 flex gap-2">
-          {(["chembl", "qm7"] as const).map((t) => (
-            <button
-              key={t}
-              onClick={() => setActiveTab(t)}
-              className={`rounded-md px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors ${
-                activeTab === t ? "bg-primary text-primary-foreground glow-primary" : "bg-secondary text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t === "chembl" ? "ChEMBL Dataset" : "QM7 Dataset"}
-            </button>
-          ))}
+        {/* Dataset info cards */}
+        <div className="mb-6 grid gap-4 sm:grid-cols-2">
+          <div className="glass-card p-4">
+            <h3 className="mb-2 font-mono text-sm font-bold text-foreground">QM7 Dataset</h3>
+            <div className="space-y-1 font-mono text-xs text-muted-foreground">
+              <p><span className="text-accent">Type:</span> Molecular energy dataset</p>
+              <p><span className="text-accent">Features:</span> Coulomb matrices / molecular descriptors</p>
+              <p><span className="text-accent">Samples:</span> 7,165</p>
+              <p><span className="text-accent">Use:</span> Regression for atomization energy</p>
+            </div>
+          </div>
+          <div className="glass-card p-4">
+            <h3 className="mb-2 font-mono text-sm font-bold text-foreground">ChEMBL Dataset</h3>
+            <div className="space-y-1 font-mono text-xs text-muted-foreground">
+              <p><span className="text-accent">Type:</span> Bioactivity dataset</p>
+              <p><span className="text-accent">Features:</span> Molecular fingerprints / descriptors</p>
+              <p><span className="text-accent">Samples:</span> 1,879,206</p>
+              <p><span className="text-accent">Use:</span> Drug-like molecule evaluation</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs + Upload */}
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex gap-2">
+            {(["chembl", "qm7"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setActiveTab(t)}
+                className={`rounded-md px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors ${
+                  activeTab === t ? "bg-primary text-primary-foreground glow-primary" : "bg-secondary text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {t === "chembl" ? "ChEMBL Dataset" : "QM7 Dataset"}
+              </button>
+            ))}
+          </div>
+          <button className="rounded-md border border-border/50 bg-secondary px-4 py-2 font-mono text-xs text-muted-foreground transition-colors hover:text-foreground">
+            Upload Dataset
+          </button>
         </div>
 
         {activeTab === "chembl" && (
