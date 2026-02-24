@@ -41,7 +41,7 @@ const Overview = () => (
               "Compare model performance using rigorous evaluation metrics (RMSE, MAE, R² Score)",
               "Enable molecule property prediction via an interactive testing interface",
               "Prepare a modular framework for future quantum computing integration using VQE and QAOA algorithms",
-              "Validate predictions against established benchmark datasets (QM7 & ChEMBL)",
+              "Validate predictions against established benchmark datasets (ChEMBL 36 & PDBbind)",
             ].map((obj, i) => (
               <li key={i} className="flex gap-3 text-sm text-muted-foreground">
                 <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary/20 font-mono text-[10px] font-bold text-primary">
@@ -59,8 +59,8 @@ const Overview = () => (
         <h2 className="mb-4 text-xl font-bold text-foreground">Methodology Overview</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { step: "01", title: "Data Collection", desc: "Gather molecular data from QM7 and ChEMBL benchmark datasets" },
-            { step: "02", title: "Feature Engineering", desc: "Extract molecular descriptors, fingerprints, and Coulomb matrices" },
+            { step: "01", title: "Data Collection", desc: "Gather molecular data from ChEMBL 36 (chemreps) and PDBbind benchmark datasets" },
+            { step: "02", title: "Feature Engineering", desc: "Extract molecular descriptors, fingerprints, and binding affinity features" },
             { step: "03", title: "Model Training", desc: "Train and optimize classical ML models with cross-validation" },
             { step: "04", title: "Evaluation", desc: "Compare models and prepare quantum-ready framework" },
           ].map((m) => (

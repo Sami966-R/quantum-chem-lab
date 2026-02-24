@@ -35,7 +35,7 @@ const correlationData = Array.from({ length: 40 }, () => ({
 }));
 
 const DatasetLab = () => {
-  const [activeTab, setActiveTab] = useState<"chembl" | "qm7">("chembl");
+  const [activeTab, setActiveTab] = useState<"chembl" | "pdbbind">("chembl");
 
   return (
     <section id="dataset" className="section-gradient relative py-20">
@@ -51,27 +51,29 @@ const DatasetLab = () => {
             <span className="font-mono text-xs uppercase tracking-widest text-accent">Section 02</span>
           </div>
           <h2 className="text-3xl font-bold text-foreground">Dataset Laboratory</h2>
-          <p className="mt-2 text-sm text-muted-foreground">ChEMBL & QM7 datasets · Interactive exploration & visualization</p>
+          <p className="mt-2 text-sm text-muted-foreground">ChEMBL 36 & PDBbind datasets · Interactive exploration & visualization</p>
         </motion.div>
 
         {/* Dataset info cards */}
         <div className="mb-6 grid gap-4 sm:grid-cols-2">
           <div className="glass-card p-4">
-            <h3 className="mb-2 font-mono text-sm font-bold text-foreground">QM7 Dataset</h3>
+            <h3 className="mb-2 font-mono text-sm font-bold text-foreground">ChEMBL 36 – chembl_36_chemreps.txt.gz</h3>
             <div className="space-y-1 font-mono text-xs text-muted-foreground">
-              <p><span className="text-accent">Type:</span> Molecular energy dataset</p>
-              <p><span className="text-accent">Features:</span> Coulomb matrices / molecular descriptors</p>
-              <p><span className="text-accent">Samples:</span> 7,165</p>
-              <p><span className="text-accent">Use:</span> Regression for atomization energy</p>
+              <p><span className="text-accent">Type:</span> Chemical representations / Bioactivity dataset</p>
+              <p><span className="text-accent">Features:</span> SMILES, InChI, InChIKey representations</p>
+              <p><span className="text-accent">Samples:</span> 2,431,025+</p>
+              <p><span className="text-accent">Format:</span> Compressed tab-separated (txt.gz)</p>
+              <p><span className="text-accent">Use:</span> Drug-like molecule evaluation & fingerprint generation</p>
             </div>
           </div>
           <div className="glass-card p-4">
-            <h3 className="mb-2 font-mono text-sm font-bold text-foreground">ChEMBL Dataset</h3>
+            <h3 className="mb-2 font-mono text-sm font-bold text-foreground">PDBbind – pdbbind.zip</h3>
             <div className="space-y-1 font-mono text-xs text-muted-foreground">
-              <p><span className="text-accent">Type:</span> Bioactivity dataset</p>
-              <p><span className="text-accent">Features:</span> Molecular fingerprints / descriptors</p>
-              <p><span className="text-accent">Samples:</span> 1,879,206</p>
-              <p><span className="text-accent">Use:</span> Drug-like molecule evaluation</p>
+              <p><span className="text-accent">Type:</span> Protein-ligand binding affinity dataset</p>
+              <p><span className="text-accent">Features:</span> 3D structures, binding constants (Kd/Ki/IC50)</p>
+              <p><span className="text-accent">Samples:</span> 23,496+ complexes</p>
+              <p><span className="text-accent">Format:</span> Compressed archive (zip)</p>
+              <p><span className="text-accent">Use:</span> Binding affinity prediction & molecular docking evaluation</p>
             </div>
           </div>
         </div>
@@ -79,7 +81,7 @@ const DatasetLab = () => {
         {/* Tabs + Upload */}
         <div className="mb-6 flex items-center justify-between">
           <div className="flex gap-2">
-            {(["chembl", "qm7"] as const).map((t) => (
+            {(["chembl", "pdbbind"] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setActiveTab(t)}
@@ -87,7 +89,7 @@ const DatasetLab = () => {
                   activeTab === t ? "bg-primary text-primary-foreground glow-primary" : "bg-secondary text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {t === "chembl" ? "ChEMBL Dataset" : "QM7 Dataset"}
+                {t === "chembl" ? "ChEMBL 36" : "PDBbind"}
               </button>
             ))}
           </div>
@@ -101,10 +103,10 @@ const DatasetLab = () => {
             {/* Stats */}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
-                { label: "Compounds", value: "1,879,206" },
-                { label: "Assays", value: "1,583,375" },
-                { label: "Targets", value: "15,328" },
-                { label: "Avg MW", value: "371.8 Da" },
+                { label: "Compounds", value: "2,431,025+" },
+                { label: "Representations", value: "SMILES / InChI" },
+                { label: "Version", value: "ChEMBL 36" },
+                { label: "Format", value: "txt.gz" },
               ].map((s) => (
                 <div key={s.label} className="glass-card p-4 text-center">
                   <div className="font-mono text-lg font-bold text-accent">{s.value}</div>
@@ -172,14 +174,14 @@ const DatasetLab = () => {
           </motion.div>
         )}
 
-        {activeTab === "qm7" && (
+        {activeTab === "pdbbind" && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
-                { label: "Molecules", value: "7,165" },
-                { label: "Max Atoms", value: "23" },
-                { label: "Properties", value: "Atomization E" },
-                { label: "Representation", value: "Coulomb Matrix" },
+                { label: "Complexes", value: "23,496+" },
+                { label: "Proteins", value: "4,852" },
+                { label: "Properties", value: "Kd / Ki / IC50" },
+                { label: "Format", value: "3D Structures" },
               ].map((s) => (
                 <div key={s.label} className="glass-card p-4 text-center">
                   <div className="font-mono text-lg font-bold text-glow-info">{s.value}</div>
@@ -189,11 +191,11 @@ const DatasetLab = () => {
             </div>
 
             <div className="glass-card p-4">
-              <h4 className="mb-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Atomization Energy Distribution</h4>
+              <h4 className="mb-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Binding Affinity Distribution</h4>
               <ResponsiveContainer width="100%" height={250}>
                 <AreaChart data={energyDist}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
-                  <XAxis dataKey="energy" tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Energy (kcal/mol)", position: "insideBottom", offset: -5, fill: "#7a7a85", fontSize: 10 }} />
+                  <XAxis dataKey="energy" tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Binding Affinity (pKd)", position: "insideBottom", offset: -5, fill: "#7a7a85", fontSize: 10 }} />
                   <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
                   <Tooltip contentStyle={{ background: "hsl(240,24%,10%)", border: "1px solid hsl(260,30%,22%)", fontSize: 11, fontFamily: "IBM Plex Mono" }} />
                   <Area type="monotone" dataKey="density" stroke="#5B2C83" fill="hsl(270,50%,34%)" fillOpacity={0.3} />
