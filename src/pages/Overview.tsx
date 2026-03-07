@@ -59,7 +59,7 @@ const Overview = () => (
         <h2 className="mb-4 text-xl font-bold text-foreground">Methodology Overview</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { step: "01", title: "Data Collection", desc: "Gather molecular data from ChEMBL 36 (chemreps) and PDBbind benchmark datasets" },
+            { step: "01", title: "Data Collection", desc: "Gather molecular data from ChEMBL 36 (chemreps) and PBDBind benchmark datasets" },
             { step: "02", title: "Feature Engineering", desc: "Extract molecular descriptors, fingerprints, and binding affinity features" },
             { step: "03", title: "Model Training", desc: "Train and optimize classical ML models with cross-validation" },
             { step: "04", title: "Evaluation", desc: "Compare models and prepare quantum-ready framework" },

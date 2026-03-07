@@ -89,7 +89,7 @@ const DatasetLab = () => {
                   activeTab === t ? "bg-primary text-primary-foreground glow-primary" : "bg-secondary text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {t === "chembl" ? "ChEMBL 36" : "PDBbind"}
+                {t === "chembl" ? "ChEMBL 36" : "PBDBind"}
               </button>
             ))}
           </div>
