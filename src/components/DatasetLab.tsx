@@ -51,7 +51,7 @@ const DatasetLab = () => {
             <span className="font-mono text-xs uppercase tracking-widest text-accent">Section 02</span>
           </div>
           <h2 className="text-3xl font-bold text-foreground">Dataset Laboratory</h2>
-          <p className="mt-2 text-sm text-muted-foreground">ChEMBL 36 & PDBbind datasets · Interactive exploration & visualization</p>
+          <p className="mt-2 text-sm text-muted-foreground">ChEMBL 36 & PBDBind datasets · Interactive exploration & visualization</p>
         </motion.div>
 
         {/* Dataset info cards */}
@@ -67,7 +67,7 @@ const DatasetLab = () => {
             </div>
           </div>
           <div className="glass-card p-4">
-            <h3 className="mb-2 font-mono text-sm font-bold text-foreground">PDBbind – pdbbind.zip</h3>
+            <h3 className="mb-2 font-mono text-sm font-bold text-foreground">PBDBind – pbdbind.zip</h3>
             <div className="space-y-1 font-mono text-xs text-muted-foreground">
               <p><span className="text-accent">Type:</span> Protein-ligand binding affinity dataset</p>
               <p><span className="text-accent">Features:</span> 3D structures, binding constants (Kd/Ki/IC50)</p>
@@ -89,7 +89,7 @@ const DatasetLab = () => {
                   activeTab === t ? "bg-primary text-primary-foreground glow-primary" : "bg-secondary text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {t === "chembl" ? "ChEMBL 36" : "PDBbind"}
+                {t === "chembl" ? "ChEMBL 36" : "PBDBind"}
               </button>
             ))}
           </div>
