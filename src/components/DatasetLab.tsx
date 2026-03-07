@@ -51,7 +51,7 @@ const DatasetLab = () => {
             <span className="font-mono text-xs uppercase tracking-widest text-accent">Section 02</span>
           </div>
           <h2 className="text-3xl font-bold text-foreground">Dataset Laboratory</h2>
-          <p className="mt-2 text-sm text-muted-foreground">ChEMBL 36 & PDBbind datasets · Interactive exploration & visualization</p>
+          <p className="mt-2 text-sm text-muted-foreground">ChEMBL 36 & PBDBind datasets · Interactive exploration & visualization</p>
         </motion.div>
 
         {/* Dataset info cards */}
