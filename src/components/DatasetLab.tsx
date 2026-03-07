@@ -67,7 +67,7 @@ const DatasetLab = () => {
             </div>
           </div>
           <div className="glass-card p-4">
-            <h3 className="mb-2 font-mono text-sm font-bold text-foreground">PDBbind – pdbbind.zip</h3>
+            <h3 className="mb-2 font-mono text-sm font-bold text-foreground">PBDBind – pbdbind.zip</h3>
             <div className="space-y-1 font-mono text-xs text-muted-foreground">
               <p><span className="text-accent">Type:</span> Protein-ligand binding affinity dataset</p>
               <p><span className="text-accent">Features:</span> 3D structures, binding constants (Kd/Ki/IC50)</p>
