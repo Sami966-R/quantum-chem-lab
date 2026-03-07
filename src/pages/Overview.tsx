@@ -41,7 +41,7 @@ const Overview = () => (
               "Compare model performance using rigorous evaluation metrics (RMSE, MAE, R² Score)",
               "Enable molecule property prediction via an interactive testing interface",
               "Prepare a modular framework for future quantum computing integration using VQE and QAOA algorithms",
-              "Validate predictions against established benchmark datasets (ChEMBL 36 & PDBbind)",
+              "Validate predictions against established benchmark datasets (ChEMBL 36 & PBDBind)",
             ].map((obj, i) => (
               <li key={i} className="flex gap-3 text-sm text-muted-foreground">
                 <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary/20 font-mono text-[10px] font-bold text-primary">
