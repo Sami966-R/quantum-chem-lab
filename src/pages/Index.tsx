@@ -18,6 +18,7 @@ const Index = () => (
     <MLBenchmark />
     <ComparisonDashboard />
     <LiveTesting />
+    <MoleculePredictor />
     <ErrorAnalysis />
     <AdminControls />
     <footer className="border-t border-border/30 py-8 text-center">
