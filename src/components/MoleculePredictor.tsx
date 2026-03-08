@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FlaskConical, Loader2, Play, Pause } from "lucide-react";
+import { FlaskConical, Loader2 } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 const PAGES = ["ChEMBL", "Predictions", "PBDBind"] as const;
