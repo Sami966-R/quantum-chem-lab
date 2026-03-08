@@ -30,7 +30,6 @@ const MoleculePredictor = () => {
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const [autoPlay, setAutoPlay] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchChEMBL = async () => {
