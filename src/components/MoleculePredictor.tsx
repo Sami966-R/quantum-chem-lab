@@ -49,7 +49,9 @@ const MoleculePredictor = () => {
 
   const fetchPDBbind = async () => {
     try {
-      const res = await fetch(`${API_URL}/pdbbind?count=6`);
+      const res = await fetch(`${API_URL}/pdbbind?count=6`, {
+        headers: { "ngrok-skip-browser-warning": "true" },
+      });
       const data = await res.json();
       setPdbbindMols(data.ligands || []);
       setError(null);
