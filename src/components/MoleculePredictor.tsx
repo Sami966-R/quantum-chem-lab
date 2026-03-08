@@ -84,13 +84,6 @@ const MoleculePredictor = () => {
     }
   };
 
-  useEffect(() => {
-    if (!autoPlay) return;
-    const timer = setInterval(() => {
-      setCurrentPage((prev) => (prev + 1) % PAGES.length);
-    }, 10000);
-    return () => clearInterval(timer);
-  }, [autoPlay]);
 
   useEffect(() => {
     setLoading(true);
