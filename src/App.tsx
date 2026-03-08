@@ -13,6 +13,7 @@ import ErrorAnalysisPage from "./pages/ErrorAnalysisPage";
 import QuantumPage from "./pages/QuantumPage";
 import TeamPage from "./pages/TeamPage";
 import NotFound from "./pages/NotFound";
+import PageTimelapse from "./components/PageTimelapse";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/team" element={<TeamPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <PageTimelapse />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
