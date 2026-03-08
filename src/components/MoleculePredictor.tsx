@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FlaskConical, Loader2, Play, Pause } from "lucide-react";
+import { FlaskConical, Loader2 } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 const PAGES = ["ChEMBL", "Predictions", "PBDBind"] as const;
@@ -30,7 +30,6 @@ const MoleculePredictor = () => {
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const [autoPlay, setAutoPlay] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchChEMBL = async () => {
@@ -85,13 +84,6 @@ const MoleculePredictor = () => {
     }
   };
 
-  useEffect(() => {
-    if (!autoPlay) return;
-    const timer = setInterval(() => {
-      setCurrentPage((prev) => (prev + 1) % PAGES.length);
-    }, 10000);
-    return () => clearInterval(timer);
-  }, [autoPlay]);
 
   useEffect(() => {
     setLoading(true);
@@ -236,7 +228,7 @@ const MoleculePredictor = () => {
           </div>
           <h2 className="text-3xl font-bold text-foreground">Molecular Binding Affinity</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Live data from your FastAPI backend · Auto-rotates every 10 seconds
+            Live data from your FastAPI backend
           </p>
         </motion.div>
 
@@ -246,10 +238,7 @@ const MoleculePredictor = () => {
             {PAGES.map((page, idx) => (
               <button
                 key={idx}
-                onClick={() => {
-                  setCurrentPage(idx);
-                  setAutoPlay(false);
-                }}
+                onClick={() => setCurrentPage(idx)}
                 className={`rounded-md px-4 py-2 font-mono text-xs font-semibold uppercase tracking-wider transition-colors ${
                   currentPage === idx
                     ? "bg-primary text-primary-foreground glow-primary"
@@ -260,17 +249,6 @@ const MoleculePredictor = () => {
               </button>
             ))}
           </div>
-          <button
-            onClick={() => setAutoPlay(!autoPlay)}
-            className={`flex items-center gap-1.5 rounded-md px-4 py-2 font-mono text-xs font-semibold transition-colors ${
-              autoPlay
-                ? "bg-accent text-accent-foreground glow-accent"
-                : "bg-secondary text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {autoPlay ? <Play className="h-3 w-3" /> : <Pause className="h-3 w-3" />}
-            {autoPlay ? "Auto (10s)" : "Paused"}
-          </button>
         </div>
 
         {/* Content */}
