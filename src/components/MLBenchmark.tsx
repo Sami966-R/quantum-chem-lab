@@ -230,8 +230,8 @@ const MLBenchmark = () => {
             ) : (
               <>
                 <div className="mb-2 flex gap-4 font-mono text-[10px] text-muted-foreground">
-                  <span>Final Train: <span className="text-foreground">{training.data?.final_train_loss?.toFixed(4)}</span></span>
-                  <span>Final Val: <span className="text-accent">{training.data?.final_val_loss?.toFixed(4)}</span></span>
+                  <span>Final Train: <span className="text-foreground">{trainingCurve?.final_train_loss?.toFixed(4)}</span></span>
+                  <span>Final Val: <span className="text-accent">{trainingCurve?.final_val_loss?.toFixed(4)}</span></span>
                 </div>
                 <ResponsiveContainer width="100%" height={250}>
                   <LineChart data={trainingChartData}>
