@@ -126,40 +126,48 @@ const MLBenchmark = () => {
   const comparison = useFetch<ModelComparison>("/ml-dashboard/model-comparison");
   const classification = useFetch<ClassificationModel[]>("/ml-dashboard/classification-metrics");
 
-  // Transform training curve
-  const trainingChartData = training.data
-    ? training.data.epochs.map((epoch, i) => ({
-        epoch,
-        train: training.data!.train_losses[i],
-        val: training.data!.val_losses[i],
+  // Unwrap nested API responses
+  const trainingCurve = (training.data as any)?.training_curve;
+  const errorDistribution = (errorDist.data as any)?.error_distribution;
+  const scatterRaw = (scatter.data as any)?.actual_vs_predicted;
+  const testMetrics = (metrics.data as any)?.metrics;
+  const comparisonModels = (comparison.data as any)?.models;
+  const classificationModels = (classification.data as any)?.models;
+
+  // Transform training curve — epochs is a count, not an array
+  const trainingChartData = trainingCurve?.train_losses
+    ? trainingCurve.train_losses.map((_: number, i: number) => ({
+        epoch: i + 1,
+        train: trainingCurve.train_losses[i],
+        val: trainingCurve.val_losses[i],
       }))
     : [];
 
   // Transform error distribution
-  const errorChartData = (set: ErrorDistData["train_set"] | undefined, label: string) => {
-    if (!set) return [];
-    return set.counts.map((count, i) => ({
+  const errorChartData = (set: any, label: string) => {
+    if (!set?.counts) return [];
+    return set.counts.map((count: number, i: number) => ({
       bin: set.bins[i]?.toFixed(2) ?? i,
       [label]: count,
     }));
   };
 
   // Transform scatter
-  const scatterData = scatter.data
-    ? scatter.data.actual.map((a, i) => ({ actual: a, predicted: scatter.data!.predicted[i] }))
+  const scatterData = scatterRaw?.actual
+    ? scatterRaw.actual.map((a: number, i: number) => ({ actual: a, predicted: scatterRaw.predicted[i] }))
     : [];
 
   // Transform radar
-  const radarData = comparison.data
-    ? Object.keys(Object.values(comparison.data)[0] || {}).map((metric) => {
+  const radarData = comparisonModels && Object.keys(comparisonModels).length > 0
+    ? Object.keys(Object.values(comparisonModels)[0] || {}).map((metric) => {
         const entry: Record<string, any> = { metric: metric.replace(/_/g, " ") };
-        Object.entries(comparison.data!).forEach(([model, vals]) => {
+        Object.entries(comparisonModels).forEach(([model, vals]) => {
           entry[model] = (vals as any)[metric] ?? 0;
         });
         return entry;
       })
     : [];
-  const radarModels = comparison.data ? Object.keys(comparison.data) : [];
+  const radarModels = comparisonModels ? Object.keys(comparisonModels) : [];
 
   const radarColors = [
     "hsl(25,100%,50%)", "hsl(270,50%,50%)", "hsl(160,60%,45%)", "hsl(200,80%,55%)",
@@ -190,12 +198,12 @@ const MLBenchmark = () => {
             <div className="col-span-3">
               <ErrorMsg msg={metrics.error} onRetry={metrics.refetch} />
             </div>
-          ) : metrics.data ? (
+          ) : testMetrics ? (
             <>
               {[
-                { label: "R² Score", value: metrics.data.r2_score?.toFixed(4), icon: Target, color: "text-accent" },
-                { label: "RMSE", value: metrics.data.rmse?.toFixed(4), icon: Activity, color: "text-[hsl(var(--glow-success))]" },
-                { label: "MAE", value: metrics.data.mae?.toFixed(4), icon: BarChart3, color: "text-[hsl(var(--glow-info))]" },
+                { label: "R² Score", value: testMetrics.r2_score?.toFixed(4), icon: Target, color: "text-accent" },
+                { label: "RMSE", value: testMetrics.rmse?.toFixed(4), icon: Activity, color: "text-[hsl(var(--glow-success))]" },
+                { label: "MAE", value: testMetrics.mae?.toFixed(4), icon: BarChart3, color: "text-[hsl(var(--glow-info))]" },
               ].map((m) => (
                 <motion.div key={m.label} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                   <GlassCard className="flex items-center gap-4">
@@ -222,8 +230,8 @@ const MLBenchmark = () => {
             ) : (
               <>
                 <div className="mb-2 flex gap-4 font-mono text-[10px] text-muted-foreground">
-                  <span>Final Train: <span className="text-foreground">{training.data?.final_train_loss?.toFixed(4)}</span></span>
-                  <span>Final Val: <span className="text-accent">{training.data?.final_val_loss?.toFixed(4)}</span></span>
+                  <span>Final Train: <span className="text-foreground">{trainingCurve?.final_train_loss?.toFixed(4)}</span></span>
+                  <span>Final Val: <span className="text-accent">{trainingCurve?.final_val_loss?.toFixed(4)}</span></span>
                 </div>
                 <ResponsiveContainer width="100%" height={250}>
                   <LineChart data={trainingChartData}>
@@ -249,7 +257,7 @@ const MLBenchmark = () => {
             ) : (
               <>
                 <div className="mb-2 font-mono text-[10px] text-muted-foreground">
-                  Points: <span className="text-foreground">{scatter.data?.count}</span> · Correlation: <span className="text-accent">{scatter.data?.correlation?.toFixed(4)}</span>
+                  Points: <span className="text-foreground">{scatterRaw?.count}</span> · Correlation: <span className="text-accent">{scatterRaw?.correlation?.toFixed(4)}</span>
                 </div>
                 <ResponsiveContainer width="100%" height={250}>
                   <ScatterChart>
@@ -275,10 +283,10 @@ const MLBenchmark = () => {
             ) : (
               <>
                 <div className="mb-2 font-mono text-[10px] text-muted-foreground">
-                  Mean: <span className="text-foreground">{errorDist.data?.train_set?.mean?.toFixed(4)}</span> · Std: <span className="text-foreground">{errorDist.data?.train_set?.std?.toFixed(4)}</span>
+                  Mean: <span className="text-foreground">{errorDistribution?.train_set?.mean?.toFixed(4)}</span> · Std: <span className="text-foreground">{errorDistribution?.train_set?.std?.toFixed(4)}</span>
                 </div>
                 <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={errorChartData(errorDist.data?.train_set, "train")}>
+                  <BarChart data={errorChartData(errorDistribution?.train_set, "train")}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
                     <XAxis dataKey="bin" tick={{ fill: "#7a7a85", fontSize: 9 }} />
                     <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
@@ -300,10 +308,10 @@ const MLBenchmark = () => {
             ) : (
               <>
                 <div className="mb-2 font-mono text-[10px] text-muted-foreground">
-                  Mean: <span className="text-foreground">{errorDist.data?.test_set?.mean?.toFixed(4)}</span> · Std: <span className="text-foreground">{errorDist.data?.test_set?.std?.toFixed(4)}</span>
+                  Mean: <span className="text-foreground">{errorDistribution?.test_set?.mean?.toFixed(4)}</span> · Std: <span className="text-foreground">{errorDistribution?.test_set?.std?.toFixed(4)}</span>
                 </div>
                 <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={errorChartData(errorDist.data?.test_set, "test")}>
+                  <BarChart data={errorChartData(errorDistribution?.test_set, "test")}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
                     <XAxis dataKey="bin" tick={{ fill: "#7a7a85", fontSize: 9 }} />
                     <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
@@ -346,6 +354,10 @@ const MLBenchmark = () => {
               <ErrorMsg msg={classification.error} onRetry={classification.refetch} />
             ) : classification.data ? (
               <div className="overflow-auto">
+                {(() => {
+                  const models = classificationModels;
+                  const modelList = Array.isArray(models) ? models : typeof models === 'object' && models ? Object.entries(models).map(([name, vals]: [string, any]) => ({ model: name, ...vals })) : [];
+                  return modelList.length > 0 ? (
                 <table className="w-full font-mono text-[10px]">
                   <thead>
                     <tr className="border-b border-border text-left text-muted-foreground">
@@ -358,7 +370,7 @@ const MLBenchmark = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {(Array.isArray(classification.data) ? classification.data : []).map((m, i) => (
+                    {modelList.map((m: any, i: number) => (
                       <tr key={i} className="border-b border-border/50">
                         <td className="py-2 pr-3 font-bold text-foreground">{m.model || m.name || `Model ${i + 1}`}</td>
                         <td className="py-2 pr-3 text-[hsl(var(--glow-success))]">{m.train_accuracy?.toFixed(2)}%</td>
@@ -370,6 +382,8 @@ const MLBenchmark = () => {
                     ))}
                   </tbody>
                 </table>
+                  ) : <p className="text-xs text-muted-foreground py-4">No classification models available.</p>;
+                })()}
               </div>
             ) : null}
           </GlassCard>
