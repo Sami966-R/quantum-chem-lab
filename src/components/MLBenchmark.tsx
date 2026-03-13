@@ -308,7 +308,7 @@ const MLBenchmark = () => {
             ) : (
               <>
                 <div className="mb-2 font-mono text-[10px] text-muted-foreground">
-                  Mean: <span className="text-foreground">{errorDist.data?.test_set?.mean?.toFixed(4)}</span> · Std: <span className="text-foreground">{errorDist.data?.test_set?.std?.toFixed(4)}</span>
+                  Mean: <span className="text-foreground">{errorDistribution?.test_set?.mean?.toFixed(4)}</span> · Std: <span className="text-foreground">{errorDistribution?.test_set?.std?.toFixed(4)}</span>
                 </div>
                 <ResponsiveContainer width="100%" height={250}>
                   <BarChart data={errorChartData(errorDist.data?.test_set, "test")}>
