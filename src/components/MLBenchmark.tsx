@@ -286,7 +286,7 @@ const MLBenchmark = () => {
                   Mean: <span className="text-foreground">{errorDistribution?.train_set?.mean?.toFixed(4)}</span> · Std: <span className="text-foreground">{errorDistribution?.train_set?.std?.toFixed(4)}</span>
                 </div>
                 <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={errorChartData(errorDist.data?.train_set, "train")}>
+                  <BarChart data={errorChartData(errorDistribution?.train_set, "train")}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
                     <XAxis dataKey="bin" tick={{ fill: "#7a7a85", fontSize: 9 }} />
                     <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
