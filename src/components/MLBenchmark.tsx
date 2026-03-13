@@ -382,6 +382,8 @@ const MLBenchmark = () => {
                     ))}
                   </tbody>
                 </table>
+                  ) : <p className="text-xs text-muted-foreground py-4">No classification models available.</p>;
+                })()}
               </div>
             ) : null}
           </GlassCard>
