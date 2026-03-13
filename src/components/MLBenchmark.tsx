@@ -126,40 +126,48 @@ const MLBenchmark = () => {
   const comparison = useFetch<ModelComparison>("/ml-dashboard/model-comparison");
   const classification = useFetch<ClassificationModel[]>("/ml-dashboard/classification-metrics");
 
-  // Transform training curve
-  const trainingChartData = training.data
-    ? training.data.epochs.map((epoch, i) => ({
-        epoch,
-        train: training.data!.train_losses[i],
-        val: training.data!.val_losses[i],
+  // Unwrap nested API responses
+  const trainingCurve = (training.data as any)?.training_curve;
+  const errorDistribution = (errorDist.data as any)?.error_distribution;
+  const scatterRaw = (scatter.data as any)?.actual_vs_predicted;
+  const testMetrics = (metrics.data as any)?.metrics;
+  const comparisonModels = (comparison.data as any)?.models;
+  const classificationModels = (classification.data as any)?.models;
+
+  // Transform training curve — epochs is a count, not an array
+  const trainingChartData = trainingCurve?.train_losses
+    ? trainingCurve.train_losses.map((_: number, i: number) => ({
+        epoch: i + 1,
+        train: trainingCurve.train_losses[i],
+        val: trainingCurve.val_losses[i],
       }))
     : [];
 
   // Transform error distribution
-  const errorChartData = (set: ErrorDistData["train_set"] | undefined, label: string) => {
-    if (!set) return [];
-    return set.counts.map((count, i) => ({
+  const errorChartData = (set: any, label: string) => {
+    if (!set?.counts) return [];
+    return set.counts.map((count: number, i: number) => ({
       bin: set.bins[i]?.toFixed(2) ?? i,
       [label]: count,
     }));
   };
 
   // Transform scatter
-  const scatterData = scatter.data
-    ? scatter.data.actual.map((a, i) => ({ actual: a, predicted: scatter.data!.predicted[i] }))
+  const scatterData = scatterRaw?.actual
+    ? scatterRaw.actual.map((a: number, i: number) => ({ actual: a, predicted: scatterRaw.predicted[i] }))
     : [];
 
   // Transform radar
-  const radarData = comparison.data
-    ? Object.keys(Object.values(comparison.data)[0] || {}).map((metric) => {
+  const radarData = comparisonModels && Object.keys(comparisonModels).length > 0
+    ? Object.keys(Object.values(comparisonModels)[0] || {}).map((metric) => {
         const entry: Record<string, any> = { metric: metric.replace(/_/g, " ") };
-        Object.entries(comparison.data!).forEach(([model, vals]) => {
+        Object.entries(comparisonModels).forEach(([model, vals]) => {
           entry[model] = (vals as any)[metric] ?? 0;
         });
         return entry;
       })
     : [];
-  const radarModels = comparison.data ? Object.keys(comparison.data) : [];
+  const radarModels = comparisonModels ? Object.keys(comparisonModels) : [];
 
   const radarColors = [
     "hsl(25,100%,50%)", "hsl(270,50%,50%)", "hsl(160,60%,45%)", "hsl(200,80%,55%)",
