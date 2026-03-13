@@ -198,12 +198,12 @@ const MLBenchmark = () => {
             <div className="col-span-3">
               <ErrorMsg msg={metrics.error} onRetry={metrics.refetch} />
             </div>
-          ) : metrics.data ? (
+          ) : testMetrics ? (
             <>
               {[
-                { label: "R² Score", value: metrics.data.r2_score?.toFixed(4), icon: Target, color: "text-accent" },
-                { label: "RMSE", value: metrics.data.rmse?.toFixed(4), icon: Activity, color: "text-[hsl(var(--glow-success))]" },
-                { label: "MAE", value: metrics.data.mae?.toFixed(4), icon: BarChart3, color: "text-[hsl(var(--glow-info))]" },
+                { label: "R² Score", value: testMetrics.r2_score?.toFixed(4), icon: Target, color: "text-accent" },
+                { label: "RMSE", value: testMetrics.rmse?.toFixed(4), icon: Activity, color: "text-[hsl(var(--glow-success))]" },
+                { label: "MAE", value: testMetrics.mae?.toFixed(4), icon: BarChart3, color: "text-[hsl(var(--glow-info))]" },
               ].map((m) => (
                 <motion.div key={m.label} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                   <GlassCard className="flex items-center gap-4">
