@@ -354,6 +354,10 @@ const MLBenchmark = () => {
               <ErrorMsg msg={classification.error} onRetry={classification.refetch} />
             ) : classification.data ? (
               <div className="overflow-auto">
+                {(() => {
+                  const models = classificationModels;
+                  const modelList = Array.isArray(models) ? models : typeof models === 'object' && models ? Object.entries(models).map(([name, vals]: [string, any]) => ({ model: name, ...vals })) : [];
+                  return modelList.length > 0 ? (
                 <table className="w-full font-mono text-[10px]">
                   <thead>
                     <tr className="border-b border-border text-left text-muted-foreground">
@@ -366,7 +370,7 @@ const MLBenchmark = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {(Array.isArray(classification.data) ? classification.data : []).map((m, i) => (
+                    {modelList.map((m: any, i: number) => (
                       <tr key={i} className="border-b border-border/50">
                         <td className="py-2 pr-3 font-bold text-foreground">{m.model || m.name || `Model ${i + 1}`}</td>
                         <td className="py-2 pr-3 text-[hsl(var(--glow-success))]">{m.train_accuracy?.toFixed(2)}%</td>
