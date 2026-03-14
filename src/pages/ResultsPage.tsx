@@ -1,107 +1,177 @@
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  LineChart, Line, ScatterChart, Scatter, AreaChart, Area,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line, ScatterChart, Scatter, AreaChart, Area, ZAxis,
 } from "recharts";
-import { BarChart3 } from "lucide-react";
+import { BarChart3, RefreshCw, AlertCircle } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const actualVsPredicted = Array.from({ length: 30 }, (_, i) => ({
-  actual: -50 + i * 3 + (Math.random() - 0.5) * 2,
-  predicted: -50 + i * 3 + (Math.random() - 0.5) * 5,
-}));
+const API_URL = import.meta.env.VITE_API_URL || "https://dentoid-afflictively-maia.ngrok-free.dev";
+const HEADERS = { "ngrok-skip-browser-warning": "true" };
 
-const modelComparison = [
-  { name: "Linear Reg", rmse: 0.72, mae: 0.58, r2: 0.78 },
-  { name: "Random Forest", rmse: 0.48, mae: 0.35, r2: 0.89 },
-  { name: "SVM", rmse: 0.55, mae: 0.42, r2: 0.85 },
-  { name: "Gradient Boost", rmse: 0.42, mae: 0.31, r2: 0.92 },
-];
+function useFetch<T>(endpoint: string) {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-const errorDist = Array.from({ length: 20 }, (_, i) => ({
-  bin: ((-2 + i * 0.2)).toFixed(1),
-  count: Math.floor(Math.exp(-((i - 10) ** 2) / 8) * 40 + Math.random() * 5),
-}));
+  const refetch = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_URL}${endpoint}`, { headers: HEADERS });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      setData(json);
+      setError(null);
+    } catch (e: any) {
+      console.error(`Fetch ${endpoint}:`, e);
+      setError(e.message || "Failed to fetch");
+    } finally {
+      setLoading(false);
+    }
+  }, [endpoint]);
 
-const trainingLoss = Array.from({ length: 20 }, (_, i) => ({
-  epoch: i + 1,
-  trainLoss: 2.5 * Math.exp(-i * 0.2) + 0.1 + Math.random() * 0.05,
-  valLoss: 2.8 * Math.exp(-i * 0.18) + 0.15 + Math.random() * 0.08,
-}));
+  useEffect(() => { refetch(); }, [refetch]);
 
-const ResultsPage = () => (
-  <div className="min-h-screen bg-background text-foreground">
-    <Navigation />
-    <div className="container mx-auto px-4 pt-24 pb-20">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
-        <div className="mb-2 flex items-center gap-2">
-          <BarChart3 className="h-5 w-5 text-accent" />
-          <span className="font-mono text-xs uppercase tracking-widest text-accent">Results Visualization</span>
-        </div>
-        <h1 className="text-3xl font-bold text-foreground">Results Dashboard</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Placeholder graphs ready for JSON data integration from Colab notebooks</p>
-      </motion.div>
+  return { data, loading, error, refetch };
+}
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Actual vs Predicted */}
-        <div className="glass-card p-4">
-          <h4 className="mb-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Actual vs Predicted Values</h4>
-          <ResponsiveContainer width="100%" height={260}>
-            <ScatterChart>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
-              <XAxis dataKey="actual" name="Actual" tick={{ fill: "#7a7a85", fontSize: 10 }} />
-              <YAxis dataKey="predicted" name="Predicted" tick={{ fill: "#7a7a85", fontSize: 10 }} />
-              <Tooltip contentStyle={{ background: "hsl(240,24%,10%)", border: "1px solid hsl(260,30%,22%)", fontSize: 11, fontFamily: "IBM Plex Mono" }} />
-              <Scatter data={actualVsPredicted} fill="#FF6B00" fillOpacity={0.7} />
-            </ScatterChart>
-          </ResponsiveContainer>
-        </div>
+const ErrorMsg = ({ msg, onRetry }: { msg: string; onRetry: () => void }) => (
+  <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
+    <AlertCircle className="h-5 w-5 text-destructive" />
+    <p className="font-mono text-xs text-muted-foreground">{msg}</p>
+    <button onClick={onRetry} className="flex items-center gap-1 rounded bg-secondary px-3 py-1 font-mono text-[10px] text-foreground hover:bg-muted">
+      <RefreshCw className="h-3 w-3" /> Retry
+    </button>
+  </div>
+);
 
-        {/* Model Comparison */}
-        <div className="glass-card p-4">
-          <h4 className="mb-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Model Comparison (R² Score)</h4>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={modelComparison}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
-              <XAxis dataKey="name" tick={{ fill: "#7a7a85", fontSize: 9 }} />
-              <YAxis domain={[0.5, 1]} tick={{ fill: "#7a7a85", fontSize: 10 }} />
-              <Tooltip contentStyle={{ background: "hsl(240,24%,10%)", border: "1px solid hsl(260,30%,22%)", fontSize: 11, fontFamily: "IBM Plex Mono" }} />
-              <Bar dataKey="r2" fill="hsl(270,50%,34%)" name="R² Score" radius={[3, 3, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+const darkTooltipStyle = {
+  background: "hsl(240,24%,10%)",
+  border: "1px solid hsl(260,30%,22%)",
+  fontSize: 11,
+  fontFamily: "IBM Plex Mono",
+};
 
-        {/* Error Distribution */}
-        <div className="glass-card p-4">
-          <h4 className="mb-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Error Distribution</h4>
-          <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={errorDist}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
-              <XAxis dataKey="bin" tick={{ fill: "#7a7a85", fontSize: 10 }} />
-              <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
-              <Tooltip contentStyle={{ background: "hsl(240,24%,10%)", border: "1px solid hsl(260,30%,22%)", fontSize: 11, fontFamily: "IBM Plex Mono" }} />
-              <Area type="monotone" dataKey="count" stroke="#FF6B00" fill="hsl(25,100%,50%)" fillOpacity={0.2} strokeWidth={2} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+const lightTooltipStyle = {
+  background: "#ffffff",
+  border: "1px solid #e2e2e2",
+  fontSize: 11,
+  fontFamily: "IBM Plex Mono",
+  color: "#1a1a1a",
+};
 
-        {/* Training Loss */}
-        <div className="glass-card p-4">
-          <h4 className="mb-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Training & Validation Loss</h4>
-          <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={trainingLoss}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
-              <XAxis dataKey="epoch" tick={{ fill: "#7a7a85", fontSize: 10 }} />
-              <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
-              <Tooltip contentStyle={{ background: "hsl(240,24%,10%)", border: "1px solid hsl(260,30%,22%)", fontSize: 11, fontFamily: "IBM Plex Mono" }} />
-              <Line type="monotone" dataKey="trainLoss" stroke="#5B2C83" strokeWidth={2} dot={false} name="Training Loss" />
-              <Line type="monotone" dataKey="valLoss" stroke="#FF6B00" strokeWidth={2} dot={false} name="Validation Loss" />
-            </LineChart>
-          </ResponsiveContainer>
+const ResultsPage = () => {
+  const scatter = useFetch<any>("/ml-dashboard/actual-vs-predicted");
+  const errorDist = useFetch<any>("/ml-dashboard/error-distribution");
+  const training = useFetch<any>("/ml-dashboard/training-curve");
+
+  const scatterRaw = scatter.data?.actual_vs_predicted;
+  const scatterData = scatterRaw?.actual
+    ? scatterRaw.actual.map((a: number, i: number) => ({ actual: a, predicted: scatterRaw.predicted[i] }))
+    : [];
+
+  const errorDistData = (() => {
+    const set = errorDist.data?.error_distribution?.test_set;
+    if (!set?.counts) return [];
+    return set.counts.map((count: number, i: number) => ({
+      bin: set.bins[i]?.toFixed(2) ?? i,
+      count,
+    }));
+  })();
+
+  const trainingCurve = training.data?.training_curve;
+  const trainingChartData = trainingCurve?.train_losses
+    ? trainingCurve.train_losses.map((_: number, i: number) => ({
+        epoch: i + 1,
+        trainLoss: trainingCurve.train_losses[i],
+        valLoss: trainingCurve.val_losses[i],
+      }))
+    : [];
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <Navigation />
+      <div className="container mx-auto px-4 pt-24 pb-20">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
+          <div className="mb-2 flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-accent" />
+            <span className="font-mono text-xs uppercase tracking-widest text-accent">Results Visualization</span>
+          </div>
+          <h1 className="text-3xl font-bold text-foreground">Results Dashboard</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Live data from backend API endpoints</p>
+        </motion.div>
+
+        <div className="grid gap-6">
+          {/* Actual vs Predicted — full width */}
+          <div className="glass-card p-4">
+            <h4 className="mb-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Actual vs Predicted Values</h4>
+            {scatter.loading ? (
+              <Skeleton className="h-[280px] w-full rounded-lg" />
+            ) : scatter.error ? (
+              <ErrorMsg msg={scatter.error} onRetry={scatter.refetch} />
+            ) : (
+              <ResponsiveContainer width="100%" height={280}>
+                <ScatterChart>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
+                  <XAxis type="number" dataKey="actual" name="Actual" tick={{ fill: "#7a7a85", fontSize: 10 }} />
+                  <YAxis type="number" dataKey="predicted" name="Predicted" tick={{ fill: "#7a7a85", fontSize: 10 }} />
+                  <ZAxis range={[20, 20]} />
+                  <Tooltip contentStyle={lightTooltipStyle} />
+                  <Scatter data={scatterData} fill="#FF6B00" fillOpacity={0.7} />
+                </ScatterChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+
+          {/* Bottom row: Error Distribution + Training Loss */}
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Error Distribution */}
+            <div className="glass-card p-4">
+              <h4 className="mb-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Error Distribution</h4>
+              {errorDist.loading ? (
+                <Skeleton className="h-[260px] w-full rounded-lg" />
+              ) : errorDist.error ? (
+                <ErrorMsg msg={errorDist.error} onRetry={errorDist.refetch} />
+              ) : (
+                <ResponsiveContainer width="100%" height={260}>
+                  <AreaChart data={errorDistData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
+                    <XAxis dataKey="bin" tick={{ fill: "#7a7a85", fontSize: 10 }} />
+                    <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
+                    <Tooltip contentStyle={darkTooltipStyle} />
+                    <Area type="monotone" dataKey="count" stroke="#FF6B00" fill="hsl(25,100%,50%)" fillOpacity={0.2} strokeWidth={2} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+
+            {/* Training & Validation Loss */}
+            <div className="glass-card p-4">
+              <h4 className="mb-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Training & Validation Loss</h4>
+              {training.loading ? (
+                <Skeleton className="h-[260px] w-full rounded-lg" />
+              ) : training.error ? (
+                <ErrorMsg msg={training.error} onRetry={training.refetch} />
+              ) : (
+                <ResponsiveContainer width="100%" height={260}>
+                  <LineChart data={trainingChartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
+                    <XAxis dataKey="epoch" tick={{ fill: "#7a7a85", fontSize: 10 }} />
+                    <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
+                    <Tooltip contentStyle={darkTooltipStyle} />
+                    <Line type="monotone" dataKey="trainLoss" stroke="#5B2C83" strokeWidth={2} dot={false} name="Training Loss" />
+                    <Line type="monotone" dataKey="valLoss" stroke="#FF6B00" strokeWidth={2} dot={false} name="Validation Loss" />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default ResultsPage;
