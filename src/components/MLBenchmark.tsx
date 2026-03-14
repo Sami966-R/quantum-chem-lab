@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   LineChart, Line, ScatterChart, Scatter, ZAxis,
 } from "recharts";
 import { Brain, TrendingUp, Activity, Target, BarChart3, RefreshCw, AlertCircle } from "lucide-react";
@@ -11,46 +10,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 const API_URL = import.meta.env.VITE_API_URL || "https://dentoid-afflictively-maia.ngrok-free.dev";
 const HEADERS = { "ngrok-skip-browser-warning": "true" };
 const POLL_INTERVAL = 30000;
-
-interface TrainingCurveData {
-  epochs: number[];
-  train_losses: number[];
-  val_losses: number[];
-  final_train_loss: number;
-  final_val_loss: number;
-}
-
-interface ErrorDistData {
-  train_set: { counts: number[]; bins: number[]; mean: number; std: number };
-  test_set: { counts: number[]; bins: number[]; mean: number; std: number };
-}
-
-interface ActualVsPredicted {
-  actual: number[];
-  predicted: number[];
-  count: number;
-  correlation: number;
-}
-
-interface TestMetrics {
-  r2_score: number;
-  rmse: number;
-  mae: number;
-}
-
-interface ModelComparison {
-  [model: string]: { accuracy?: number; speed?: number; precision?: number; f1_score?: number };
-}
-
-interface ClassificationModel {
-  model?: string;
-  name?: string;
-  train_accuracy: number;
-  test_accuracy: number;
-  mae: number;
-  rmse: number;
-  r2: number;
-}
 
 function useFetch<T>(endpoint: string) {
   const [data, setData] = useState<T | null>(null);
@@ -111,30 +70,32 @@ const LoadingSkeleton = ({ h = 250 }: { h?: number }) => (
   </div>
 );
 
-const tooltipStyle = {
+const darkTooltipStyle = {
   background: "hsl(240,24%,10%)",
   border: "1px solid hsl(260,30%,22%)",
   fontSize: 11,
   fontFamily: "IBM Plex Mono",
 };
 
+const lightTooltipStyle = {
+  background: "#ffffff",
+  border: "1px solid #e2e2e2",
+  fontSize: 11,
+  fontFamily: "IBM Plex Mono",
+  color: "#1a1a1a",
+};
+
 const MLBenchmark = () => {
-  const training = useFetch<TrainingCurveData>("/ml-dashboard/training-curve");
-  const errorDist = useFetch<ErrorDistData>("/ml-dashboard/error-distribution");
-  const scatter = useFetch<ActualVsPredicted>("/ml-dashboard/actual-vs-predicted");
-  const metrics = useFetch<TestMetrics>("/ml-dashboard/test-metrics");
-  const comparison = useFetch<ModelComparison>("/ml-dashboard/model-comparison");
-  const classification = useFetch<ClassificationModel[]>("/ml-dashboard/classification-metrics");
+  const training = useFetch<any>("/ml-dashboard/training-curve");
+  const errorDist = useFetch<any>("/ml-dashboard/error-distribution");
+  const scatter = useFetch<any>("/ml-dashboard/actual-vs-predicted");
+  const classification = useFetch<any>("/ml-dashboard/classification-metrics");
 
-  // Unwrap nested API responses
-  const trainingCurve = (training.data as any)?.training_curve;
-  const errorDistribution = (errorDist.data as any)?.error_distribution;
-  const scatterRaw = (scatter.data as any)?.actual_vs_predicted;
-  const testMetrics = (metrics.data as any)?.metrics;
-  const comparisonModels = (comparison.data as any)?.models;
-  const classificationModels = (classification.data as any)?.models;
+  const trainingCurve = training.data?.training_curve;
+  const errorDistribution = errorDist.data?.error_distribution;
+  const scatterRaw = scatter.data?.actual_vs_predicted;
+  const classMetrics = classification.data?.metrics;
 
-  // Transform training curve — epochs is a count, not an array
   const trainingChartData = trainingCurve?.train_losses
     ? trainingCurve.train_losses.map((_: number, i: number) => ({
         epoch: i + 1,
@@ -143,7 +104,6 @@ const MLBenchmark = () => {
       }))
     : [];
 
-  // Transform error distribution
   const errorChartData = (set: any, label: string) => {
     if (!set?.counts) return [];
     return set.counts.map((count: number, i: number) => ({
@@ -152,26 +112,9 @@ const MLBenchmark = () => {
     }));
   };
 
-  // Transform scatter
   const scatterData = scatterRaw?.actual
     ? scatterRaw.actual.map((a: number, i: number) => ({ actual: a, predicted: scatterRaw.predicted[i] }))
     : [];
-
-  // Transform radar
-  const radarData = comparisonModels && Object.keys(comparisonModels).length > 0
-    ? Object.keys(Object.values(comparisonModels)[0] || {}).map((metric) => {
-        const entry: Record<string, any> = { metric: metric.replace(/_/g, " ") };
-        Object.entries(comparisonModels).forEach(([model, vals]) => {
-          entry[model] = (vals as any)[metric] ?? 0;
-        });
-        return entry;
-      })
-    : [];
-  const radarModels = comparisonModels ? Object.keys(comparisonModels) : [];
-
-  const radarColors = [
-    "hsl(25,100%,50%)", "hsl(270,50%,50%)", "hsl(160,60%,45%)", "hsl(200,80%,55%)",
-  ];
 
   return (
     <section id="ml" className="section-gradient relative py-20">
@@ -183,27 +126,27 @@ const MLBenchmark = () => {
             <span className="font-mono text-xs uppercase tracking-widest text-accent">ML Dashboard</span>
           </div>
           <h2 className="text-3xl font-bold text-foreground">Live Model Benchmarking</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Real-time training metrics · Error analysis · Model comparison</p>
+          <p className="mt-2 text-sm text-muted-foreground">Real-time training metrics · Error analysis · Regression results</p>
         </motion.div>
 
-        {/* Test Metrics Summary */}
+        {/* Regression Metrics from /classification-metrics */}
         <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {metrics.loading ? (
+          {classification.loading ? (
             <>
               <Skeleton className="h-24 rounded-lg" />
               <Skeleton className="h-24 rounded-lg" />
               <Skeleton className="h-24 rounded-lg" />
             </>
-          ) : metrics.error ? (
+          ) : classification.error ? (
             <div className="col-span-3">
-              <ErrorMsg msg={metrics.error} onRetry={metrics.refetch} />
+              <ErrorMsg msg={classification.error} onRetry={classification.refetch} />
             </div>
-          ) : testMetrics ? (
+          ) : classMetrics ? (
             <>
               {[
-                { label: "R² Score", value: testMetrics.r2_score?.toFixed(4), icon: Target, color: "text-accent" },
-                { label: "RMSE", value: testMetrics.rmse?.toFixed(4), icon: Activity, color: "text-[hsl(var(--glow-success))]" },
-                { label: "MAE", value: testMetrics.mae?.toFixed(4), icon: BarChart3, color: "text-[hsl(var(--glow-info))]" },
+                { label: "R² Score", value: classMetrics.r2_score?.toFixed(4), icon: Target, color: "text-accent" },
+                { label: "RMSE", value: classMetrics.rmse?.toFixed(4), icon: Activity, color: "text-[hsl(var(--glow-success))]" },
+                { label: "MAE", value: classMetrics.mae?.toFixed(4), icon: BarChart3, color: "text-[hsl(var(--glow-info))]" },
               ].map((m) => (
                 <motion.div key={m.label} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                   <GlassCard className="flex items-center gap-4">
@@ -219,7 +162,8 @@ const MLBenchmark = () => {
           ) : null}
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        {/* Top row: Training Curve + Actual vs Predicted */}
+        <div className="grid gap-6 lg:grid-cols-2 mb-6">
           {/* Training Curve */}
           <GlassCard>
             <SectionHeader icon={TrendingUp} label="Training" title="Loss Curve" />
@@ -238,7 +182,7 @@ const MLBenchmark = () => {
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
                     <XAxis dataKey="epoch" tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Epoch", position: "insideBottom", offset: -2, fill: "#7a7a85", fontSize: 10 }} />
                     <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Loss", angle: -90, position: "insideLeft", fill: "#7a7a85", fontSize: 10 }} />
-                    <Tooltip contentStyle={tooltipStyle} />
+                    <Tooltip contentStyle={darkTooltipStyle} />
                     <Line type="monotone" dataKey="train" stroke="hsl(270,50%,50%)" strokeWidth={2} dot={false} name="Train Loss" />
                     <Line type="monotone" dataKey="val" stroke="hsl(25,100%,50%)" strokeWidth={2} dot={false} name="Val Loss" />
                   </LineChart>
@@ -265,15 +209,17 @@ const MLBenchmark = () => {
                     <XAxis type="number" dataKey="actual" name="Actual" tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Actual", position: "insideBottom", offset: -2, fill: "#7a7a85", fontSize: 10 }} />
                     <YAxis type="number" dataKey="predicted" name="Predicted" tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Predicted", angle: -90, position: "insideLeft", fill: "#7a7a85", fontSize: 10 }} />
                     <ZAxis range={[20, 20]} />
-                    <Tooltip contentStyle={tooltipStyle} />
+                    <Tooltip contentStyle={lightTooltipStyle} />
                     <Scatter data={scatterData} fill="hsl(25,100%,50%)" fillOpacity={0.6} />
                   </ScatterChart>
                 </ResponsiveContainer>
               </>
             )}
           </GlassCard>
+        </div>
 
-          {/* Error Distribution */}
+        {/* Bottom row: Error Distributions */}
+        <div className="grid gap-6 lg:grid-cols-2">
           <GlassCard>
             <SectionHeader icon={BarChart3} label="Error" title="Train Distribution" />
             {errorDist.loading ? (
@@ -290,7 +236,7 @@ const MLBenchmark = () => {
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
                     <XAxis dataKey="bin" tick={{ fill: "#7a7a85", fontSize: 9 }} />
                     <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
-                    <Tooltip contentStyle={tooltipStyle} />
+                    <Tooltip contentStyle={darkTooltipStyle} />
                     <Bar dataKey="train" fill="hsl(270,50%,34%)" name="Train Errors" radius={[3, 3, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -298,7 +244,6 @@ const MLBenchmark = () => {
             )}
           </GlassCard>
 
-          {/* Error Distribution - Test */}
           <GlassCard>
             <SectionHeader icon={BarChart3} label="Error" title="Test Distribution" />
             {errorDist.loading ? (
@@ -315,63 +260,12 @@ const MLBenchmark = () => {
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
                     <XAxis dataKey="bin" tick={{ fill: "#7a7a85", fontSize: 9 }} />
                     <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
-                    <Tooltip contentStyle={tooltipStyle} />
+                    <Tooltip contentStyle={darkTooltipStyle} />
                     <Bar dataKey="test" fill="hsl(25,100%,50%)" name="Test Errors" radius={[3, 3, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </>
             )}
-          </GlassCard>
-
-          {/* Radar - Model Comparison */}
-          <GlassCard>
-            <SectionHeader icon={Brain} label="Comparison" title="Model Radar" />
-            {comparison.loading ? (
-              <LoadingSkeleton />
-            ) : comparison.error ? (
-              <ErrorMsg msg={comparison.error} onRetry={comparison.refetch} />
-            ) : (
-              <ResponsiveContainer width="100%" height={300}>
-                <RadarChart data={radarData}>
-                  <PolarGrid stroke="hsl(260,30%,22%)" />
-                  <PolarAngleAxis dataKey="metric" tick={{ fill: "#7a7a85", fontSize: 10 }} />
-                  <PolarRadiusAxis tick={{ fill: "#7a7a85", fontSize: 8 }} />
-                  {radarModels.map((model, i) => (
-                    <Radar key={model} name={model} dataKey={model} stroke={radarColors[i % radarColors.length]} fill={radarColors[i % radarColors.length]} fillOpacity={0.15} />
-                  ))}
-                  <Tooltip contentStyle={tooltipStyle} />
-                </RadarChart>
-              </ResponsiveContainer>
-            )}
-          </GlassCard>
-
-          {/* Regression Metrics from Classification Endpoint */}
-          <GlassCard>
-            <SectionHeader icon={Activity} label="Regression" title="Model Metrics" />
-            {classification.loading ? (
-              <LoadingSkeleton h={200} />
-            ) : classification.error ? (
-              <ErrorMsg msg={classification.error} onRetry={classification.refetch} />
-            ) : (() => {
-              const m = (classification.data as any)?.metrics;
-              return m ? (
-                <div className="grid grid-cols-3 gap-4">
-                  {[
-                    { label: "R² Score", value: m.r2_score?.toFixed(4), icon: Target, color: "text-accent" },
-                    { label: "RMSE", value: m.rmse?.toFixed(4), icon: Activity, color: "text-[hsl(var(--glow-success))]" },
-                    { label: "MAE", value: m.mae?.toFixed(4), icon: BarChart3, color: "text-[hsl(var(--glow-info))]" },
-                  ].map((item) => (
-                    <div key={item.label} className="flex items-center gap-3">
-                      <item.icon className={`h-6 w-6 ${item.color}`} />
-                      <div>
-                        <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{item.label}</p>
-                        <p className="font-mono text-lg font-bold text-foreground">{item.value ?? "—"}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : <p className="text-xs text-muted-foreground py-4">No regression metrics available.</p>;
-            })()}
           </GlassCard>
         </div>
       </div>
