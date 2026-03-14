@@ -345,47 +345,33 @@ const MLBenchmark = () => {
             )}
           </GlassCard>
 
-          {/* Classification Metrics Table */}
+          {/* Regression Metrics from Classification Endpoint */}
           <GlassCard>
-            <SectionHeader icon={Activity} label="Classification" title="Model Metrics" />
+            <SectionHeader icon={Activity} label="Regression" title="Model Metrics" />
             {classification.loading ? (
               <LoadingSkeleton h={200} />
             ) : classification.error ? (
               <ErrorMsg msg={classification.error} onRetry={classification.refetch} />
-            ) : classification.data ? (
-              <div className="overflow-auto">
-                {(() => {
-                  const models = classificationModels;
-                  const modelList = Array.isArray(models) ? models : typeof models === 'object' && models ? Object.entries(models).map(([name, vals]: [string, any]) => ({ model: name, ...vals })) : [];
-                  return modelList.length > 0 ? (
-                <table className="w-full font-mono text-[10px]">
-                  <thead>
-                    <tr className="border-b border-border text-left text-muted-foreground">
-                      <th className="pb-2 pr-3">Model</th>
-                      <th className="pb-2 pr-3">Train Acc</th>
-                      <th className="pb-2 pr-3">Test Acc</th>
-                      <th className="pb-2 pr-3">MAE</th>
-                      <th className="pb-2 pr-3">RMSE</th>
-                      <th className="pb-2">R²</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {modelList.map((m: any, i: number) => (
-                      <tr key={i} className="border-b border-border/50">
-                        <td className="py-2 pr-3 font-bold text-foreground">{m.model || m.name || `Model ${i + 1}`}</td>
-                        <td className="py-2 pr-3 text-[hsl(var(--glow-success))]">{m.train_accuracy?.toFixed(2)}%</td>
-                        <td className="py-2 pr-3 text-foreground">{m.test_accuracy?.toFixed(2)}%</td>
-                        <td className="py-2 pr-3 text-foreground">{m.mae?.toFixed(4)}</td>
-                        <td className="py-2 pr-3 text-foreground">{m.rmse?.toFixed(4)}</td>
-                        <td className="py-2 text-accent">{m.r2?.toFixed(4)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                  ) : <p className="text-xs text-muted-foreground py-4">No classification models available.</p>;
-                })()}
-              </div>
-            ) : null}
+            ) : (() => {
+              const m = (classification.data as any)?.metrics;
+              return m ? (
+                <div className="grid grid-cols-3 gap-4">
+                  {[
+                    { label: "R² Score", value: m.r2_score?.toFixed(4), icon: Target, color: "text-accent" },
+                    { label: "RMSE", value: m.rmse?.toFixed(4), icon: Activity, color: "text-[hsl(var(--glow-success))]" },
+                    { label: "MAE", value: m.mae?.toFixed(4), icon: BarChart3, color: "text-[hsl(var(--glow-info))]" },
+                  ].map((item) => (
+                    <div key={item.label} className="flex items-center gap-3">
+                      <item.icon className={`h-6 w-6 ${item.color}`} />
+                      <div>
+                        <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{item.label}</p>
+                        <p className="font-mono text-lg font-bold text-foreground">{item.value ?? "—"}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : <p className="text-xs text-muted-foreground py-4">No regression metrics available.</p>;
+            })()}
           </GlassCard>
         </div>
       </div>
