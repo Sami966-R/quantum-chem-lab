@@ -124,28 +124,14 @@ const MoleculePredictor = () => {
         return (
           <div>
             <h3 className="mb-6 font-mono text-lg font-bold text-foreground">ChEMBL Molecules (Real Data)</h3>
-            {chemblMols.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No molecules loaded</p>
+            {chemblImage ? (
+              <img
+                src={`data:image/png;base64,${chemblImage}`}
+                alt="ChEMBL Molecular Grid"
+                className="w-full rounded-lg"
+              />
             ) : (
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                {chemblMols.map((mol, idx) => (
-                  <div key={idx} className="glass-card overflow-hidden p-4 transition-shadow hover:shadow-lg">
-                    {mol.image && (
-                      <img
-                        src={`data:image/png;base64,${mol.image}`}
-                        alt="molecule"
-                        className="mb-3 h-40 w-full rounded bg-secondary object-contain"
-                      />
-                    )}
-                    <p className="break-all font-mono text-xs font-semibold text-accent">
-                      {mol.chembl_id || "Unknown"}
-                    </p>
-                    <p className="mt-1 break-all font-mono text-[10px] text-muted-foreground">
-                      {mol.canonical_smiles?.substring(0, 30)}...
-                    </p>
-                  </div>
-                ))}
-              </div>
+              <p className="text-sm text-muted-foreground">No molecule data loaded</p>
             )}
           </div>
         );
