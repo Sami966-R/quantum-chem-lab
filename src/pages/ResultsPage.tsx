@@ -124,10 +124,10 @@ const ResultsPage = () => {
                 <ResponsiveContainer width="100%" height={260}>
                   <AreaChart data={errorDistData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
-                    <XAxis dataKey="bin" tick={{ fill: "#7a7a85", fontSize: 10 }} />
-                    <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
-                    <Tooltip contentStyle={darkTooltipStyle} />
-                    <Area type="monotone" dataKey="count" stroke="#FF6B00" fill="hsl(25,100%,50%)" fillOpacity={0.2} strokeWidth={2} />
+                    <XAxis dataKey="bins" tick={{ fill: "#7a7a85", fontSize: 10 }} />
+                     <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
+                     <Tooltip contentStyle={darkTooltipStyle} />
+                     <Area type="monotone" dataKey="counts" stroke="#FF6B00" fill="hsl(25,100%,50%)" fillOpacity={0.2} strokeWidth={2} />
                   </AreaChart>
                 </ResponsiveContainer>
               )}
