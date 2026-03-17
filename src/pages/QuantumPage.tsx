@@ -4,9 +4,9 @@ import Navigation from "@/components/Navigation";
 import { Badge } from "@/components/ui/badge";
 
 const quantumResults = [
-  { metric: "Binding Affinity MAE", classical: "6.19", quantum: "1.32", status: "Completed" },
-  { metric: "Binding Affinity RMSE", classical: "6.56", quantum: "1.68", status: "Completed" },
-  { metric: "R² Score", classical: "-8.08", quantum: "0.21", status: "Completed" },
+  { metric: "Binding Affinity MAE", classical: "1.14", quantum: "1.32", status: "Completed" },
+  { metric: "Binding Affinity RMSE", classical: "1.57", quantum: "1.68", status: "Completed" },
+  { metric: "R² Score", classical: "0.32", quantum: "0.21", status: "Completed" },
   { metric: "Edge Processing", classical: "Euclidean Distance", quantum: "FidelityQuantumKernel", status: "Integrated" },
   { metric: "Electronic Features", classical: "N/A", quantum: "VQE HOMO-LUMO Gap", status: "Integrated" },
 ];
@@ -80,7 +80,7 @@ const QuantumPage = () => (
           <div>
             <p className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-400 mb-1">Pipeline Complete</p>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              The hybrid quantum approach achieved an MAE of <span className="text-accent font-medium">1.32</span> (vs 6.19 classical) and an R² of <span className="text-accent font-medium">0.21</span> (vs -8.08 classical), demonstrating significant improvement in binding affinity prediction using quantum-enhanced features.
+              The hybrid quantum approach achieved an MAE of <span className="text-accent font-medium">1.32</span> (vs 1.14 classical) and an R² of <span className="text-accent font-medium">0.21</span> (vs 0.32 classical). While the classical baseline currently outperforms on these metrics, the quantum pipeline demonstrates successful integration of VQE and FidelityQuantumKernel features into the molecular GNN.
             </p>
           </div>
         </div>
