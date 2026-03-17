@@ -25,8 +25,8 @@ interface Prediction {
 }
 
 const MoleculePredictor = () => {
-  const [chemblMols, setChemblMols] = useState<ChemblMol[]>([]);
-  const [pdbbindMols, setPdbbindMols] = useState<PdbbindLig[]>([]);
+  const [chemblImage, setChemblImage] = useState<string | null>(null);
+  const [pdbbindImage, setPdbbindImage] = useState<string | null>(null);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
@@ -38,8 +38,12 @@ const MoleculePredictor = () => {
         headers: { "ngrok-skip-browser-warning": "true" },
       });
       const data = await res.json();
-      setChemblMols(data.molecules || []);
-      setError(null);
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setChemblImage(data.image || null);
+        setError(null);
+      }
     } catch (e) {
       console.error("ChEMBL fetch error:", e);
       setError("Could not connect to the API. Make sure the backend is running.");
