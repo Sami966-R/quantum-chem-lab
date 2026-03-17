@@ -165,7 +165,7 @@ const MLBenchmark = () => {
                     <XAxis dataKey="epoch" tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Epoch", position: "insideBottom", offset: -2, fill: "#7a7a85", fontSize: 10 }} />
                     <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Loss", angle: -90, position: "insideLeft", fill: "#7a7a85", fontSize: 10 }} />
                     <Tooltip contentStyle={darkTooltipStyle} />
-                    <Line type="monotone" dataKey="train" stroke="hsl(270,50%,50%)" strokeWidth={2} dot={false} name="Train Loss" />
+                    <Line type="monotone" dataKey="train_loss" stroke="hsl(270,50%,50%)" strokeWidth={2} dot={false} name="Train Loss" />
                   </LineChart>
                 </ResponsiveContainer>
               </>
