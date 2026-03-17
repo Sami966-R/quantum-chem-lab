@@ -157,7 +157,7 @@ const MLBenchmark = () => {
             ) : (
               <>
                 <div className="mb-2 font-mono text-[10px] text-muted-foreground">
-                  Epochs: <span className="text-foreground">{trainingCurve?.epochs ?? trainingChartData.length}</span>
+                  Epochs: <span className="text-foreground">{trainingChartData.length}</span>
                 </div>
                 <ResponsiveContainer width="100%" height={280}>
                   <LineChart data={trainingChartData}>
