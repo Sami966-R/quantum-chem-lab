@@ -147,7 +147,7 @@ const ResultsPage = () => {
                     <XAxis dataKey="epoch" tick={{ fill: "#7a7a85", fontSize: 10 }} />
                     <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
                     <Tooltip contentStyle={darkTooltipStyle} />
-                    <Line type="monotone" dataKey="trainLoss" stroke="#5B2C83" strokeWidth={2} dot={false} name="Training Loss" />
+                    <Line type="monotone" dataKey="train_loss" stroke="#5B2C83" strokeWidth={2} dot={false} name="Training Loss" />
                   </LineChart>
                 </ResponsiveContainer>
               )}
