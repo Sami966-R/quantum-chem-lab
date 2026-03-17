@@ -182,7 +182,7 @@ const MLBenchmark = () => {
             ) : (
               <>
                 <div className="mb-2 font-mono text-[10px] text-muted-foreground">
-                  Points: <span className="text-foreground">{scatterRaw?.count}</span> · Correlation: <span className="text-accent">{scatterRaw?.correlation?.toFixed(4)}</span>
+                  Points: <span className="text-foreground">{scatterData.length}</span>
                 </div>
                 <ResponsiveContainer width="100%" height={280}>
                   <ScatterChart>
