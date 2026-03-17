@@ -67,27 +67,14 @@ const ResultsPage = () => {
   const errorDist = useFetch<any>("/ml-dashboard/error-distribution");
   const training = useFetch<any>("/ml-dashboard/training-curve");
 
-  const scatterRaw = scatter.data?.actual_vs_predicted;
-  const scatterData = scatterRaw?.actual
-    ? scatterRaw.actual.map((a: number, i: number) => ({ actual: a, predicted: scatterRaw.predicted[i] }))
-    : [];
+  // API returns flat array: [{actual, predicted, x, y}, ...]
+  const scatterData = scatter.data?.actual_vs_predicted || scatter.data?.data || [];
 
-  const errorDistData = (() => {
-    const set = errorDist.data?.error_distribution?.test_set;
-    if (!set?.counts) return [];
-    return set.counts.map((count: number, i: number) => ({
-      bin: set.bins[i]?.toFixed(2) ?? i,
-      count,
-    }));
-  })();
+  // API returns flat array: [{bins, counts}, ...]
+  const errorDistData = errorDist.data?.error_distribution || errorDist.data?.data || [];
 
-  const trainingCurve = training.data?.training_curve;
-  const trainingChartData = trainingCurve?.train_losses
-    ? trainingCurve.train_losses.map((_: number, i: number) => ({
-        epoch: i + 1,
-        trainLoss: trainingCurve.train_losses[i],
-      }))
-    : [];
+  // API returns flat array: [{epoch, train_loss, ...}, ...]
+  const trainingChartData = training.data?.training_curve || training.data?.data || [];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -114,8 +101,8 @@ const ResultsPage = () => {
               <ResponsiveContainer width="100%" height={280}>
                 <ScatterChart>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
-                  <XAxis type="number" dataKey="actual" name="Actual" tick={{ fill: "#7a7a85", fontSize: 10 }} />
-                  <YAxis type="number" dataKey="predicted" name="Predicted" tick={{ fill: "#7a7a85", fontSize: 10 }} />
+                  <XAxis type="number" dataKey="x" name="Actual" tick={{ fill: "#7a7a85", fontSize: 10 }} />
+                   <YAxis type="number" dataKey="y" name="Predicted" tick={{ fill: "#7a7a85", fontSize: 10 }} />
                   <ZAxis range={[20, 20]} />
                   <Tooltip contentStyle={lightTooltipStyle} />
                   <Scatter data={scatterData} fill="#FF6B00" fillOpacity={0.7} />
@@ -137,10 +124,10 @@ const ResultsPage = () => {
                 <ResponsiveContainer width="100%" height={260}>
                   <AreaChart data={errorDistData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
-                    <XAxis dataKey="bin" tick={{ fill: "#7a7a85", fontSize: 10 }} />
-                    <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
-                    <Tooltip contentStyle={darkTooltipStyle} />
-                    <Area type="monotone" dataKey="count" stroke="#FF6B00" fill="hsl(25,100%,50%)" fillOpacity={0.2} strokeWidth={2} />
+                    <XAxis dataKey="bins" tick={{ fill: "#7a7a85", fontSize: 10 }} />
+                     <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
+                     <Tooltip contentStyle={darkTooltipStyle} />
+                     <Area type="monotone" dataKey="counts" stroke="#FF6B00" fill="hsl(25,100%,50%)" fillOpacity={0.2} strokeWidth={2} />
                   </AreaChart>
                 </ResponsiveContainer>
               )}
@@ -160,7 +147,7 @@ const ResultsPage = () => {
                     <XAxis dataKey="epoch" tick={{ fill: "#7a7a85", fontSize: 10 }} />
                     <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
                     <Tooltip contentStyle={darkTooltipStyle} />
-                    <Line type="monotone" dataKey="trainLoss" stroke="#5B2C83" strokeWidth={2} dot={false} name="Training Loss" />
+                    <Line type="monotone" dataKey="train_loss" stroke="#5B2C83" strokeWidth={2} dot={false} name="Training Loss" />
                   </LineChart>
                 </ResponsiveContainer>
               )}

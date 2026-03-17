@@ -25,8 +25,8 @@ interface Prediction {
 }
 
 const MoleculePredictor = () => {
-  const [chemblMols, setChemblMols] = useState<ChemblMol[]>([]);
-  const [pdbbindMols, setPdbbindMols] = useState<PdbbindLig[]>([]);
+  const [chemblImage, setChemblImage] = useState<string | null>(null);
+  const [pdbbindImage, setPdbbindImage] = useState<string | null>(null);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
@@ -38,8 +38,12 @@ const MoleculePredictor = () => {
         headers: { "ngrok-skip-browser-warning": "true" },
       });
       const data = await res.json();
-      setChemblMols(data.molecules || []);
-      setError(null);
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setChemblImage(data.image || null);
+        setError(null);
+      }
     } catch (e) {
       console.error("ChEMBL fetch error:", e);
       setError("Could not connect to the API. Make sure the backend is running.");
@@ -52,8 +56,12 @@ const MoleculePredictor = () => {
         headers: { "ngrok-skip-browser-warning": "true" },
       });
       const data = await res.json();
-      setPdbbindMols(data.ligands || []);
-      setError(null);
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setPdbbindImage(data.image || null);
+        setError(null);
+      }
     } catch (e) {
       console.error("PBDBind fetch error:", e);
       setError("Could not connect to the API. Make sure the backend is running.");
@@ -116,28 +124,14 @@ const MoleculePredictor = () => {
         return (
           <div>
             <h3 className="mb-6 font-mono text-lg font-bold text-foreground">ChEMBL Molecules (Real Data)</h3>
-            {chemblMols.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No molecules loaded</p>
+            {chemblImage ? (
+              <img
+                src={`data:image/png;base64,${chemblImage}`}
+                alt="ChEMBL Molecular Grid"
+                className="w-full rounded-lg"
+              />
             ) : (
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                {chemblMols.map((mol, idx) => (
-                  <div key={idx} className="glass-card overflow-hidden p-4 transition-shadow hover:shadow-lg">
-                    {mol.image && (
-                      <img
-                        src={`data:image/png;base64,${mol.image}`}
-                        alt="molecule"
-                        className="mb-3 h-40 w-full rounded bg-secondary object-contain"
-                      />
-                    )}
-                    <p className="break-all font-mono text-xs font-semibold text-accent">
-                      {mol.chembl_id || "Unknown"}
-                    </p>
-                    <p className="mt-1 break-all font-mono text-[10px] text-muted-foreground">
-                      {mol.canonical_smiles?.substring(0, 30)}...
-                    </p>
-                  </div>
-                ))}
-              </div>
+              <p className="text-sm text-muted-foreground">No molecule data loaded</p>
             )}
           </div>
         );
@@ -174,34 +168,15 @@ const MoleculePredictor = () => {
       case "PBDBind":
         return (
           <div>
-            <h3 className="mb-6 font-mono text-lg font-bold text-foreground">PBDBind Protein-Ligand Complexes (Real Data)</h3>
-            {pdbbindMols.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No ligands loaded</p>
+            <h3 className="mb-6 font-mono text-lg font-bold text-foreground">PDBbind Protein-Ligand Complexes (Real Data)</h3>
+            {pdbbindImage ? (
+              <img
+                src={`data:image/png;base64,${pdbbindImage}`}
+                alt="PDBbind Ligand Grid"
+                className="w-full rounded-lg"
+              />
             ) : (
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {pdbbindMols.map((lig, idx) => (
-                  <div key={idx} className="glass-card overflow-hidden p-4 transition-shadow hover:shadow-lg">
-                    {lig.image && (
-                      <img
-                        src={`data:image/png;base64,${lig.image}`}
-                        alt="ligand"
-                        className="mb-3 h-40 w-full rounded bg-secondary object-contain"
-                      />
-                    )}
-                    <div className="space-y-1">
-                      <p className="font-mono text-sm font-bold text-accent">{lig.pdb_id}</p>
-                      <p className="font-mono text-xs text-muted-foreground">
-                        <span className="text-foreground">Resolution:</span> {lig.resolution || "N/A"} Å
-                      </p>
-                      {lig.binding_affinity && (
-                        <p className="font-mono text-xs text-muted-foreground">
-                          <span className="text-foreground">Affinity:</span> {lig.binding_affinity} pKd
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <p className="text-sm text-muted-foreground">No ligand data loaded</p>
             )}
           </div>
         );

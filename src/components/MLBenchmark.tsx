@@ -90,20 +90,14 @@ const MLBenchmark = () => {
   const scatter = useFetch<any>("/ml-dashboard/actual-vs-predicted");
   const classification = useFetch<any>("/ml-dashboard/classification-metrics");
 
-  const trainingCurve = training.data?.training_curve;
-  const scatterRaw = scatter.data?.actual_vs_predicted;
-  const classMetrics = classification.data?.metrics;
+  // API returns flat array: [{epoch, train_loss, ...}, ...]
+  const trainingChartData = training.data?.training_curve || training.data?.data || [];
 
-  const trainingChartData = trainingCurve?.train_losses
-    ? trainingCurve.train_losses.map((_: number, i: number) => ({
-        epoch: i + 1,
-        train: trainingCurve.train_losses[i],
-      }))
-    : [];
+  // API returns flat array: [{actual, predicted, x, y}, ...]
+  const scatterData = scatter.data?.actual_vs_predicted || scatter.data?.data || [];
 
-  const scatterData = scatterRaw?.actual
-    ? scatterRaw.actual.map((a: number, i: number) => ({ actual: a, predicted: scatterRaw.predicted[i] }))
-    : [];
+  // Metrics are at data.metrics or directly on data
+  const classMetrics = classification.data?.metrics || classification.data?.data || classification.data;
 
   return (
     <section id="ml" className="section-gradient relative py-20">
@@ -163,7 +157,7 @@ const MLBenchmark = () => {
             ) : (
               <>
                 <div className="mb-2 font-mono text-[10px] text-muted-foreground">
-                  Epochs: <span className="text-foreground">{trainingCurve?.epochs ?? trainingChartData.length}</span>
+                  Epochs: <span className="text-foreground">{trainingChartData.length}</span>
                 </div>
                 <ResponsiveContainer width="100%" height={280}>
                   <LineChart data={trainingChartData}>
@@ -171,7 +165,7 @@ const MLBenchmark = () => {
                     <XAxis dataKey="epoch" tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Epoch", position: "insideBottom", offset: -2, fill: "#7a7a85", fontSize: 10 }} />
                     <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Loss", angle: -90, position: "insideLeft", fill: "#7a7a85", fontSize: 10 }} />
                     <Tooltip contentStyle={darkTooltipStyle} />
-                    <Line type="monotone" dataKey="train" stroke="hsl(270,50%,50%)" strokeWidth={2} dot={false} name="Train Loss" />
+                    <Line type="monotone" dataKey="train_loss" stroke="hsl(270,50%,50%)" strokeWidth={2} dot={false} name="Train Loss" />
                   </LineChart>
                 </ResponsiveContainer>
               </>
@@ -188,13 +182,13 @@ const MLBenchmark = () => {
             ) : (
               <>
                 <div className="mb-2 font-mono text-[10px] text-muted-foreground">
-                  Points: <span className="text-foreground">{scatterRaw?.count}</span> · Correlation: <span className="text-accent">{scatterRaw?.correlation?.toFixed(4)}</span>
+                  Points: <span className="text-foreground">{scatterData.length}</span>
                 </div>
                 <ResponsiveContainer width="100%" height={280}>
                   <ScatterChart>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
-                    <XAxis type="number" dataKey="actual" name="Actual" tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Actual", position: "insideBottom", offset: -2, fill: "#7a7a85", fontSize: 10 }} />
-                    <YAxis type="number" dataKey="predicted" name="Predicted" tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Predicted", angle: -90, position: "insideLeft", fill: "#7a7a85", fontSize: 10 }} />
+                    <XAxis type="number" dataKey="x" name="Actual" tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Actual", position: "insideBottom", offset: -2, fill: "#7a7a85", fontSize: 10 }} />
+                     <YAxis type="number" dataKey="y" name="Predicted" tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Predicted", angle: -90, position: "insideLeft", fill: "#7a7a85", fontSize: 10 }} />
                     <ZAxis range={[20, 20]} />
                     <Tooltip contentStyle={lightTooltipStyle} />
                     <Scatter data={scatterData} fill="hsl(25,100%,50%)" fillOpacity={0.6} />
