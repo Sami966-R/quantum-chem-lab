@@ -101,8 +101,8 @@ const ResultsPage = () => {
               <ResponsiveContainer width="100%" height={280}>
                 <ScatterChart>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
-                  <XAxis type="number" dataKey="actual" name="Actual" tick={{ fill: "#7a7a85", fontSize: 10 }} />
-                  <YAxis type="number" dataKey="predicted" name="Predicted" tick={{ fill: "#7a7a85", fontSize: 10 }} />
+                  <XAxis type="number" dataKey="x" name="Actual" tick={{ fill: "#7a7a85", fontSize: 10 }} />
+                   <YAxis type="number" dataKey="y" name="Predicted" tick={{ fill: "#7a7a85", fontSize: 10 }} />
                   <ZAxis range={[20, 20]} />
                   <Tooltip contentStyle={lightTooltipStyle} />
                   <Scatter data={scatterData} fill="#FF6B00" fillOpacity={0.7} />
