@@ -90,20 +90,14 @@ const MLBenchmark = () => {
   const scatter = useFetch<any>("/ml-dashboard/actual-vs-predicted");
   const classification = useFetch<any>("/ml-dashboard/classification-metrics");
 
-  const trainingCurve = training.data?.training_curve;
-  const scatterRaw = scatter.data?.actual_vs_predicted;
-  const classMetrics = classification.data?.metrics;
+  // API returns flat array: [{epoch, train_loss, ...}, ...]
+  const trainingChartData = training.data?.training_curve || training.data?.data || [];
 
-  const trainingChartData = trainingCurve?.train_losses
-    ? trainingCurve.train_losses.map((_: number, i: number) => ({
-        epoch: i + 1,
-        train: trainingCurve.train_losses[i],
-      }))
-    : [];
+  // API returns flat array: [{actual, predicted, x, y}, ...]
+  const scatterData = scatter.data?.actual_vs_predicted || scatter.data?.data || [];
 
-  const scatterData = scatterRaw?.actual
-    ? scatterRaw.actual.map((a: number, i: number) => ({ actual: a, predicted: scatterRaw.predicted[i] }))
-    : [];
+  // Metrics are at data.metrics or directly on data
+  const classMetrics = classification.data?.metrics || classification.data?.data || classification.data;
 
   return (
     <section id="ml" className="section-gradient relative py-20">
