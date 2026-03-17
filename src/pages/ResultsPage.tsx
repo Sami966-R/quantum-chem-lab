@@ -67,27 +67,14 @@ const ResultsPage = () => {
   const errorDist = useFetch<any>("/ml-dashboard/error-distribution");
   const training = useFetch<any>("/ml-dashboard/training-curve");
 
-  const scatterRaw = scatter.data?.actual_vs_predicted;
-  const scatterData = scatterRaw?.actual
-    ? scatterRaw.actual.map((a: number, i: number) => ({ actual: a, predicted: scatterRaw.predicted[i] }))
-    : [];
+  // API returns flat array: [{actual, predicted, x, y}, ...]
+  const scatterData = scatter.data?.actual_vs_predicted || scatter.data?.data || [];
 
-  const errorDistData = (() => {
-    const set = errorDist.data?.error_distribution?.test_set;
-    if (!set?.counts) return [];
-    return set.counts.map((count: number, i: number) => ({
-      bin: set.bins[i]?.toFixed(2) ?? i,
-      count,
-    }));
-  })();
+  // API returns flat array: [{bins, counts}, ...]
+  const errorDistData = errorDist.data?.error_distribution || errorDist.data?.data || [];
 
-  const trainingCurve = training.data?.training_curve;
-  const trainingChartData = trainingCurve?.train_losses
-    ? trainingCurve.train_losses.map((_: number, i: number) => ({
-        epoch: i + 1,
-        trainLoss: trainingCurve.train_losses[i],
-      }))
-    : [];
+  // API returns flat array: [{epoch, train_loss, ...}, ...]
+  const trainingChartData = training.data?.training_curve || training.data?.data || [];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
