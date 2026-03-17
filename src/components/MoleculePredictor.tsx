@@ -56,8 +56,12 @@ const MoleculePredictor = () => {
         headers: { "ngrok-skip-browser-warning": "true" },
       });
       const data = await res.json();
-      setPdbbindMols(data.ligands || []);
-      setError(null);
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setPdbbindImage(data.image || null);
+        setError(null);
+      }
     } catch (e) {
       console.error("PBDBind fetch error:", e);
       setError("Could not connect to the API. Make sure the backend is running.");
