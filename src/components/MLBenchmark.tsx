@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line, ScatterChart, Scatter, ZAxis,
 } from "recharts";
 import { Brain, TrendingUp, Activity, Target, BarChart3, RefreshCw, AlertCircle } from "lucide-react";
@@ -87,12 +87,10 @@ const lightTooltipStyle = {
 
 const MLBenchmark = () => {
   const training = useFetch<any>("/ml-dashboard/training-curve");
-  const errorDist = useFetch<any>("/ml-dashboard/error-distribution");
   const scatter = useFetch<any>("/ml-dashboard/actual-vs-predicted");
   const classification = useFetch<any>("/ml-dashboard/classification-metrics");
 
   const trainingCurve = training.data?.training_curve;
-  const errorDistribution = errorDist.data?.error_distribution;
   const scatterRaw = scatter.data?.actual_vs_predicted;
   const classMetrics = classification.data?.metrics;
 
@@ -100,17 +98,8 @@ const MLBenchmark = () => {
     ? trainingCurve.train_losses.map((_: number, i: number) => ({
         epoch: i + 1,
         train: trainingCurve.train_losses[i],
-        val: trainingCurve.val_losses[i],
       }))
     : [];
-
-  const errorChartData = (set: any, label: string) => {
-    if (!set?.counts) return [];
-    return set.counts.map((count: number, i: number) => ({
-      bin: set.bins[i]?.toFixed(2) ?? i,
-      [label]: count,
-    }));
-  };
 
   const scatterData = scatterRaw?.actual
     ? scatterRaw.actual.map((a: number, i: number) => ({ actual: a, predicted: scatterRaw.predicted[i] }))
@@ -126,10 +115,10 @@ const MLBenchmark = () => {
             <span className="font-mono text-xs uppercase tracking-widest text-accent">ML Dashboard</span>
           </div>
           <h2 className="text-3xl font-bold text-foreground">Live Model Benchmarking</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Real-time training metrics · Error analysis · Regression results</p>
+          <p className="mt-2 text-sm text-muted-foreground">Real-time training metrics · Regression results</p>
         </motion.div>
 
-        {/* Regression Metrics from /classification-metrics */}
+        {/* Regression Metrics */}
         <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {classification.loading ? (
             <>
@@ -162,9 +151,9 @@ const MLBenchmark = () => {
           ) : null}
         </div>
 
-        {/* Top row: Training Curve + Actual vs Predicted */}
-        <div className="grid gap-6 lg:grid-cols-2 mb-6">
-          {/* Training Curve */}
+        {/* Charts: Training Curve + Actual vs Predicted side by side */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Training Curve (train_losses only) */}
           <GlassCard>
             <SectionHeader icon={TrendingUp} label="Training" title="Loss Curve" />
             {training.loading ? (
@@ -173,18 +162,16 @@ const MLBenchmark = () => {
               <ErrorMsg msg={training.error} onRetry={training.refetch} />
             ) : (
               <>
-                <div className="mb-2 flex gap-4 font-mono text-[10px] text-muted-foreground">
-                  <span>Final Train: <span className="text-foreground">{trainingCurve?.final_train_loss?.toFixed(4)}</span></span>
-                  <span>Final Val: <span className="text-accent">{trainingCurve?.final_val_loss?.toFixed(4)}</span></span>
+                <div className="mb-2 font-mono text-[10px] text-muted-foreground">
+                  Epochs: <span className="text-foreground">{trainingCurve?.epochs ?? trainingChartData.length}</span>
                 </div>
-                <ResponsiveContainer width="100%" height={250}>
+                <ResponsiveContainer width="100%" height={280}>
                   <LineChart data={trainingChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
                     <XAxis dataKey="epoch" tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Epoch", position: "insideBottom", offset: -2, fill: "#7a7a85", fontSize: 10 }} />
                     <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Loss", angle: -90, position: "insideLeft", fill: "#7a7a85", fontSize: 10 }} />
                     <Tooltip contentStyle={darkTooltipStyle} />
                     <Line type="monotone" dataKey="train" stroke="hsl(270,50%,50%)" strokeWidth={2} dot={false} name="Train Loss" />
-                    <Line type="monotone" dataKey="val" stroke="hsl(25,100%,50%)" strokeWidth={2} dot={false} name="Val Loss" />
                   </LineChart>
                 </ResponsiveContainer>
               </>
@@ -203,7 +190,7 @@ const MLBenchmark = () => {
                 <div className="mb-2 font-mono text-[10px] text-muted-foreground">
                   Points: <span className="text-foreground">{scatterRaw?.count}</span> · Correlation: <span className="text-accent">{scatterRaw?.correlation?.toFixed(4)}</span>
                 </div>
-                <ResponsiveContainer width="100%" height={250}>
+                <ResponsiveContainer width="100%" height={280}>
                   <ScatterChart>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
                     <XAxis type="number" dataKey="actual" name="Actual" tick={{ fill: "#7a7a85", fontSize: 10 }} label={{ value: "Actual", position: "insideBottom", offset: -2, fill: "#7a7a85", fontSize: 10 }} />
@@ -212,57 +199,6 @@ const MLBenchmark = () => {
                     <Tooltip contentStyle={lightTooltipStyle} />
                     <Scatter data={scatterData} fill="hsl(25,100%,50%)" fillOpacity={0.6} />
                   </ScatterChart>
-                </ResponsiveContainer>
-              </>
-            )}
-          </GlassCard>
-        </div>
-
-        {/* Bottom row: Error Distributions */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          <GlassCard>
-            <SectionHeader icon={BarChart3} label="Error" title="Train Distribution" />
-            {errorDist.loading ? (
-              <LoadingSkeleton />
-            ) : errorDist.error ? (
-              <ErrorMsg msg={errorDist.error} onRetry={errorDist.refetch} />
-            ) : (
-              <>
-                <div className="mb-2 font-mono text-[10px] text-muted-foreground">
-                  Mean: <span className="text-foreground">{errorDistribution?.train_set?.mean?.toFixed(4)}</span> · Std: <span className="text-foreground">{errorDistribution?.train_set?.std?.toFixed(4)}</span>
-                </div>
-                <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={errorChartData(errorDistribution?.train_set, "train")}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
-                    <XAxis dataKey="bin" tick={{ fill: "#7a7a85", fontSize: 9 }} />
-                    <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
-                    <Tooltip contentStyle={darkTooltipStyle} />
-                    <Bar dataKey="train" fill="hsl(270,50%,34%)" name="Train Errors" radius={[3, 3, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </>
-            )}
-          </GlassCard>
-
-          <GlassCard>
-            <SectionHeader icon={BarChart3} label="Error" title="Test Distribution" />
-            {errorDist.loading ? (
-              <LoadingSkeleton />
-            ) : errorDist.error ? (
-              <ErrorMsg msg={errorDist.error} onRetry={errorDist.refetch} />
-            ) : (
-              <>
-                <div className="mb-2 font-mono text-[10px] text-muted-foreground">
-                  Mean: <span className="text-foreground">{errorDistribution?.test_set?.mean?.toFixed(4)}</span> · Std: <span className="text-foreground">{errorDistribution?.test_set?.std?.toFixed(4)}</span>
-                </div>
-                <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={errorChartData(errorDistribution?.test_set, "test")}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(260,30%,22%)" />
-                    <XAxis dataKey="bin" tick={{ fill: "#7a7a85", fontSize: 9 }} />
-                    <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
-                    <Tooltip contentStyle={darkTooltipStyle} />
-                    <Bar dataKey="test" fill="hsl(25,100%,50%)" name="Test Errors" radius={[3, 3, 0, 0]} />
-                  </BarChart>
                 </ResponsiveContainer>
               </>
             )}

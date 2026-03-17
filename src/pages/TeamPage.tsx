@@ -3,9 +3,9 @@ import { Users, GraduationCap, Building, Calendar } from "lucide-react";
 import Navigation from "@/components/Navigation";
 
 const team = [
-  { name: "Muhammad Samiullah", role: "Lead Researcher" },
+  { name: "Muhammad Samiullah", role: "Front End Developer" },
   { name: "Muhammad Danish Nadeem", role: "ML Engineer" },
-  { name: "Safwaan Saleem", role: "Data Analyst" },
+  { name: "Safwaan Saleem", role: "Lead Researcher" },
 ];
 
 const TeamPage = () => (
@@ -39,7 +39,7 @@ const TeamPage = () => (
       {/* Supervisor & Details */}
       <div className="mx-auto max-w-2xl space-y-4">
         {[
-          { icon: GraduationCap, label: "Supervisor", value: "Sir Zunnurain Hussain" },
+          { icon: GraduationCap, label: "Supervisor", value: "Assistant Professor . Muhammad Zunnurain Hussain" },
           { icon: Building, label: "University", value: "Bahria University Lahore Campus" },
           { icon: Calendar, label: "Academic Year", value: "2025 – 2026" },
         ].map((info) => (

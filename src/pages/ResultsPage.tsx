@@ -86,7 +86,6 @@ const ResultsPage = () => {
     ? trainingCurve.train_losses.map((_: number, i: number) => ({
         epoch: i + 1,
         trainLoss: trainingCurve.train_losses[i],
-        valLoss: trainingCurve.val_losses[i],
       }))
     : [];
 
@@ -147,9 +146,9 @@ const ResultsPage = () => {
               )}
             </div>
 
-            {/* Training & Validation Loss */}
+            {/* Training Loss (train_losses only) */}
             <div className="glass-card p-4">
-              <h4 className="mb-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Training & Validation Loss</h4>
+              <h4 className="mb-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Training Loss</h4>
               {training.loading ? (
                 <Skeleton className="h-[260px] w-full rounded-lg" />
               ) : training.error ? (
@@ -162,7 +161,6 @@ const ResultsPage = () => {
                     <YAxis tick={{ fill: "#7a7a85", fontSize: 10 }} />
                     <Tooltip contentStyle={darkTooltipStyle} />
                     <Line type="monotone" dataKey="trainLoss" stroke="#5B2C83" strokeWidth={2} dot={false} name="Training Loss" />
-                    <Line type="monotone" dataKey="valLoss" stroke="#FF6B00" strokeWidth={2} dot={false} name="Validation Loss" />
                   </LineChart>
                 </ResponsiveContainer>
               )}
