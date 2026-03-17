@@ -168,34 +168,15 @@ const MoleculePredictor = () => {
       case "PBDBind":
         return (
           <div>
-            <h3 className="mb-6 font-mono text-lg font-bold text-foreground">PBDBind Protein-Ligand Complexes (Real Data)</h3>
-            {pdbbindMols.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No ligands loaded</p>
+            <h3 className="mb-6 font-mono text-lg font-bold text-foreground">PDBbind Protein-Ligand Complexes (Real Data)</h3>
+            {pdbbindImage ? (
+              <img
+                src={`data:image/png;base64,${pdbbindImage}`}
+                alt="PDBbind Ligand Grid"
+                className="w-full rounded-lg"
+              />
             ) : (
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {pdbbindMols.map((lig, idx) => (
-                  <div key={idx} className="glass-card overflow-hidden p-4 transition-shadow hover:shadow-lg">
-                    {lig.image && (
-                      <img
-                        src={`data:image/png;base64,${lig.image}`}
-                        alt="ligand"
-                        className="mb-3 h-40 w-full rounded bg-secondary object-contain"
-                      />
-                    )}
-                    <div className="space-y-1">
-                      <p className="font-mono text-sm font-bold text-accent">{lig.pdb_id}</p>
-                      <p className="font-mono text-xs text-muted-foreground">
-                        <span className="text-foreground">Resolution:</span> {lig.resolution || "N/A"} Å
-                      </p>
-                      {lig.binding_affinity && (
-                        <p className="font-mono text-xs text-muted-foreground">
-                          <span className="text-foreground">Affinity:</span> {lig.binding_affinity} pKd
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <p className="text-sm text-muted-foreground">No ligand data loaded</p>
             )}
           </div>
         );
