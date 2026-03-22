@@ -1,12 +1,20 @@
 import { useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Atom, CheckCircle2, FlaskConical, Loader2, Trophy, ShieldCheck, ShieldAlert } from "lucide-react";
+import { Atom, CheckCircle2, FlaskConical, Loader2, Trophy, ShieldCheck, ShieldAlert, Package, Radio } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
 
 const API_URL = import.meta.env.VITE_API_URL || "https://dentoid-afflictively-maia.ngrok-free.dev";
 const HEADERS = { "ngrok-skip-browser-warning": "true" };
+
+interface TopCandidate {
+  pdb_id: string;
+  protein_type: string;
+  predicted_pkd: number;
+  stability: string;
+}
 
 interface ScreeningResult {
   rank: number;
@@ -17,25 +25,33 @@ interface ScreeningResult {
 }
 
 interface ScreeningData {
-  top_candidate: { pdb_id: string; pkd: number; stability: string };
+  success: boolean;
+  cached: boolean;
+  total_screened: number;
+  top_candidate: TopCandidate;
   results: ScreeningResult[];
 }
 
 const ResultsDisplay = ({ screening }: { screening: ScreeningData }) => (
   <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+    {/* Top Candidate */}
     <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-5">
       <div className="flex items-center gap-3 mb-3">
         <Trophy className="h-5 w-5 text-emerald-400" />
         <span className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-400">Top Candidate</span>
       </div>
-      <div className="flex items-center gap-6">
+      <div className="flex flex-wrap items-center gap-6">
         <div>
           <p className="text-xs text-muted-foreground mb-0.5">PDB ID</p>
           <p className="font-mono text-lg font-bold text-foreground">{screening.top_candidate.pdb_id}</p>
         </div>
         <div>
+          <p className="text-xs text-muted-foreground mb-0.5">Protein Type</p>
+          <p className="font-mono text-lg font-bold text-foreground">{screening.top_candidate.protein_type}</p>
+        </div>
+        <div>
           <p className="text-xs text-muted-foreground mb-0.5">Predicted pKd</p>
-          <p className="font-mono text-lg font-bold text-accent">{screening.top_candidate.pkd}</p>
+          <p className="font-mono text-lg font-bold text-accent">{screening.top_candidate.predicted_pkd.toFixed(5)}</p>
         </div>
         <Badge variant="outline" className="gap-1 text-[10px] bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
           <ShieldCheck className="h-3 w-3" />
@@ -44,6 +60,7 @@ const ResultsDisplay = ({ screening }: { screening: ScreeningData }) => (
       </div>
     </div>
 
+    {/* Results Table */}
     <div className="overflow-x-auto">
       <table className="w-full text-left font-mono text-xs">
         <thead>
@@ -63,7 +80,7 @@ const ResultsDisplay = ({ screening }: { screening: ScreeningData }) => (
                 <td className="px-3 py-2.5 text-muted-foreground">{r.rank}</td>
                 <td className="px-3 py-2.5 text-foreground font-medium">{r.pdb_id}</td>
                 <td className="px-3 py-2.5 text-muted-foreground">{r.protein_type}</td>
-                <td className="px-3 py-2.5 text-accent font-semibold">{r.predicted_pkd}</td>
+                <td className="px-3 py-2.5 text-accent font-semibold">{r.predicted_pkd.toFixed(6)}</td>
                 <td className="px-3 py-2.5">
                   <Badge
                     variant="outline"
@@ -100,7 +117,11 @@ const QuantumPage = () => {
       try {
         const res = await fetch(`${API_URL}/quantum-dashboard/virtual-screening`, { headers: HEADERS });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        setComparisonData(await res.json());
+        const data = await res.json();
+        if (data.success === false) {
+          throw new Error(data.detail || "API returned failure");
+        }
+        setComparisonData(data);
       } catch (e: any) {
         setComparisonError(e.message || "Failed to fetch");
       } finally {
@@ -115,9 +136,15 @@ const QuantumPage = () => {
       setError(null);
       const res = await fetch(`${API_URL}/quantum-dashboard/virtual-screening`, { headers: HEADERS });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setScreening(await res.json());
+      const data = await res.json();
+      if (data.success === false) {
+        toast({ title: "Screening Failed", description: data.detail || "Unknown error", variant: "destructive" });
+        return;
+      }
+      setScreening(data);
     } catch (e: any) {
       setError(e.message || "Failed to fetch");
+      toast({ title: "Network Error", description: e.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -144,10 +171,30 @@ const QuantumPage = () => {
           </p>
         </div>
 
-        {/* Live Comparison Data (replaces static table) */}
+        {/* Live Comparison Data */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
           <div className="glass-card p-6 mb-8">
-            <h3 className="mb-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Virtual Screening — Live Results</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">Virtual Screening — Live Results</h3>
+              <div className="flex items-center gap-2">
+                {comparisonData && (
+                  <>
+                    <Badge variant="outline" className="text-[10px] bg-accent/20 text-accent border-accent/30">
+                      {comparisonData.total_screened} compounds screened
+                    </Badge>
+                    {comparisonData.cached ? (
+                      <Badge variant="outline" className="gap-1 text-[10px] bg-blue-500/20 text-blue-400 border-blue-500/30">
+                        <Package className="h-3 w-3" /> Cached Results
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="gap-1 text-[10px] bg-red-500/20 text-red-400 border-red-500/30">
+                        <Radio className="h-3 w-3" /> Live Results
+                      </Badge>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
             {comparisonLoading && (
               <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground text-sm">
                 <Loader2 className="h-4 w-4 animate-spin" /> Loading screening data…
@@ -197,7 +244,25 @@ const QuantumPage = () => {
               </div>
             )}
 
-            {screening && !loading && <ResultsDisplay screening={screening} />}
+            {screening && !loading && (
+              <>
+                <div className="flex items-center gap-2 mb-4">
+                  <Badge variant="outline" className="text-[10px] bg-accent/20 text-accent border-accent/30">
+                    {screening.total_screened} compounds screened
+                  </Badge>
+                  {screening.cached ? (
+                    <Badge variant="outline" className="gap-1 text-[10px] bg-blue-500/20 text-blue-400 border-blue-500/30">
+                      <Package className="h-3 w-3" /> Cached Results
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="gap-1 text-[10px] bg-red-500/20 text-red-400 border-red-500/30">
+                      <Radio className="h-3 w-3" /> Live Results
+                    </Badge>
+                  )}
+                </div>
+                <ResultsDisplay screening={screening} />
+              </>
+            )}
           </div>
         </motion.div>
       </div>

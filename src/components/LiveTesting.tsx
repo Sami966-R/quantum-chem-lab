@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { FlaskConical, Play, Atom, Cpu, Layers } from "lucide-react";
+import { FlaskConical, Play, Atom, Cpu, Layers, AlertTriangle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "@/hooks/use-toast";
 
 const EXAMPLE_SMILES = [
   { name: "Aspirin", smiles: "CC(=O)Oc1ccccc1C(=O)O" },
@@ -8,16 +10,24 @@ const EXAMPLE_SMILES = [
   { name: "Ibuprofen", smiles: "CC(C)Cc1ccc(cc1)C(C)C(=O)O" },
 ];
 
+interface PredictionResult {
+  success: boolean;
+  smiles: string;
+  name: string;
+  mode: string;
+  energy: number;
+  affinity: number;
+  stability_score: number;
+  stability: number;
+  confidence: number;
+  message: string;
+  model_loaded: boolean;
+}
+
 const LiveTesting = () => {
   const [smiles, setSmiles] = useState("CC(=O)Oc1ccccc1C(=O)O");
   const [mode, setMode] = useState<"classical" | "quantum" | "hybrid">("hybrid");
-  const [result, setResult] = useState<null | {
-    energy: number;
-    affinity: number;
-    stability: number;
-    confidence: number;
-    message?: string;
-  }>(null);
+  const [result, setResult] = useState<PredictionResult | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handlePredict = async () => {
@@ -32,15 +42,14 @@ const LiveTesting = () => {
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      setResult({
-        energy: data.energy,
-        affinity: data.affinity,
-        stability: data.stability_score,
-        confidence: data.confidence,
-        message: data.message,
-      });
+      if (data.success === false) {
+        toast({ title: "Prediction Failed", description: data.detail || "Unknown error", variant: "destructive" });
+        return;
+      }
+      setResult(data);
     } catch (e: any) {
       console.error("Prediction failed:", e);
+      toast({ title: "Network Error", description: e.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -131,30 +140,37 @@ const LiveTesting = () => {
             {result ? (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                 <div className="rounded-md border border-border/30 bg-muted/30 p-3 font-mono text-xs text-accent">
-                  SMILES: {smiles}
+                  SMILES: {result.smiles || smiles}
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="rounded-md bg-muted/50 p-4 text-center">
                     <div className="font-mono text-2xl font-bold text-glow-success">{result.energy.toFixed(3)}</div>
-                    <div className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">Energy (Ha)</div>
+                    <div className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">Energy (HA)</div>
                   </div>
                   <div className="rounded-md bg-muted/50 p-4 text-center">
                     <div className="font-mono text-2xl font-bold text-accent">{result.affinity.toFixed(2)}</div>
-                    <div className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">Binding Affinity (pKi)</div>
+                    <div className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">Binding Affinity (PKI)</div>
                   </div>
                   <div className="rounded-md bg-muted/50 p-4 text-center">
-                    <div className="font-mono text-2xl font-bold text-glow-info">{result.stability.toFixed(1)}%</div>
+                    <div className="font-mono text-2xl font-bold text-glow-info">{result.stability_score.toFixed(1)}%</div>
                     <div className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">Stability Score</div>
                   </div>
                   <div className="rounded-md bg-muted/50 p-4 text-center">
                     <div className="font-mono text-2xl font-bold text-foreground">{result.confidence.toFixed(1)}%</div>
                     <div className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">Confidence</div>
+                    {result.model_loaded === false && (
+                      <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-yellow-500/20 px-2 py-0.5 text-[10px] font-mono text-yellow-400">
+                        <AlertTriangle className="h-3 w-3" /> Untrained model
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="rounded-md border border-border/30 bg-muted/20 p-3">
-                  <div className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Mode: {mode.toUpperCase()}</div>
+                  <Badge variant="outline" className="mb-1 text-[10px] bg-accent/20 text-accent border-accent/30">
+                    {result.mode}
+                  </Badge>
                   <div className="mt-1 font-mono text-xs text-muted-foreground">
-                    {result.message || `Prediction completed using ${mode === "hybrid" ? "VQE + Gradient Boosting" : mode === "quantum" ? "VQE Ansatz" : "Gradient Boosting"} pipeline.`}
+                    {result.message}
                   </div>
                 </div>
               </motion.div>
