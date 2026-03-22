@@ -16,21 +16,34 @@ const LiveTesting = () => {
     affinity: number;
     stability: number;
     confidence: number;
+    message?: string;
   }>(null);
   const [loading, setLoading] = useState(false);
 
-  const handlePredict = () => {
+  const handlePredict = async () => {
     setLoading(true);
     setResult(null);
-    setTimeout(() => {
-      setResult({
-        energy: -74.5 + Math.random() * 3,
-        affinity: 6.5 + Math.random() * 3,
-        stability: 70 + Math.random() * 25,
-        confidence: 85 + Math.random() * 12,
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || "https://dentoid-afflictively-maia.ngrok-free.dev";
+      const res = await fetch(`${API_URL}/predict`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
+        body: JSON.stringify({ smiles, mode }),
       });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setResult({
+        energy: data.energy,
+        affinity: data.affinity,
+        stability: data.stability_score,
+        confidence: data.confidence,
+        message: data.message,
+      });
+    } catch (e: any) {
+      console.error("Prediction failed:", e);
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   const modes = [
@@ -141,7 +154,7 @@ const LiveTesting = () => {
                 <div className="rounded-md border border-border/30 bg-muted/20 p-3">
                   <div className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Mode: {mode.toUpperCase()}</div>
                   <div className="mt-1 font-mono text-xs text-muted-foreground">
-                    Prediction completed using {mode === "hybrid" ? "VQE + Gradient Boosting" : mode === "quantum" ? "VQE Ansatz" : "Gradient Boosting"} pipeline.
+                    {result.message || `Prediction completed using ${mode === "hybrid" ? "VQE + Gradient Boosting" : mode === "quantum" ? "VQE Ansatz" : "Gradient Boosting"} pipeline.`}
                   </div>
                 </div>
               </motion.div>
