@@ -1,10 +1,6 @@
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Trophy, ShieldCheck, ShieldAlert, Package, Radio, Loader2 } from "lucide-react";
+import { Trophy, ShieldCheck, ShieldAlert } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
-const API_URL = import.meta.env.VITE_API_URL || "https://dentoid-afflictively-maia.ngrok-free.dev";
-const HEADERS = { "ngrok-skip-browser-warning": "true" };
 
 interface TopCandidate {
   pdb_id: string;
@@ -21,72 +17,30 @@ interface ScreeningResult {
   stability: string;
 }
 
-interface ScreeningData {
-  success: boolean;
-  cached: boolean;
-  total_screened: number;
-  top_candidate: TopCandidate;
+interface VirtualScreeningProps {
+  topCandidate: TopCandidate | null;
   results: ScreeningResult[];
 }
 
-const VirtualScreening = () => {
-  const [data, setData] = useState<ScreeningData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch(`${API_URL}/quantum-dashboard/virtual-screening`, { headers: HEADERS });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
-        if (json.success === false) throw new Error(json.detail || "API returned failure");
-        setData(json);
-      } catch (e: any) {
-        setError(e.message || "Failed to fetch");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+const VirtualScreening = ({ topCandidate, results }: VirtualScreeningProps) => {
+  const hasData = topCandidate && results.length > 0;
 
   return (
     <div className="glass-card p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-mono text-xs uppercase tracking-wider text-muted-foreground">Virtual Screening — Live Results</h3>
-        <div className="flex items-center gap-2">
-          {data && (
-            <>
-              <Badge variant="outline" className="text-[10px] bg-accent/20 text-accent border-accent/30">
-                {data.total_screened} compounds screened
-              </Badge>
-              {data.cached ? (
-                <Badge variant="outline" className="gap-1 text-[10px] bg-blue-500/20 text-blue-400 border-blue-500/30">
-                  <Package className="h-3 w-3" /> Cached Results
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="gap-1 text-[10px] bg-red-500/20 text-red-400 border-red-500/30">
-                  <Radio className="h-3 w-3" /> Live Results
-                </Badge>
-              )}
-            </>
-          )}
-        </div>
+        {hasData && (
+          <Badge variant="outline" className="text-[10px] bg-accent/20 text-accent border-accent/30">
+            {results.length} compounds screened
+          </Badge>
+        )}
       </div>
 
-      {loading && (
-        <div className="flex items-center justify-center py-8 gap-2 text-muted-foreground text-sm">
-          <Loader2 className="h-4 w-4 animate-spin" /> Loading screening data…
+      {!hasData ? (
+        <div className="flex items-center justify-center py-8 text-muted-foreground">
+          <p className="font-mono text-xs">Run a prediction to see screening results</p>
         </div>
-      )}
-
-      {error && (
-        <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-xs text-destructive font-mono">
-          {error}
-        </div>
-      )}
-
-      {data && !loading && (
+      ) : (
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
           {/* Top Candidate */}
           <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-5">
@@ -97,19 +51,19 @@ const VirtualScreening = () => {
             <div className="flex flex-wrap items-center gap-6">
               <div>
                 <p className="text-xs text-muted-foreground mb-0.5">PDB ID</p>
-                <p className="font-mono text-lg font-bold text-foreground">{data.top_candidate.pdb_id}</p>
+                <p className="font-mono text-lg font-bold text-foreground">{topCandidate.pdb_id}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground mb-0.5">Protein Type</p>
-                <p className="font-mono text-lg font-bold text-foreground">{data.top_candidate.protein_type}</p>
+                <p className="font-mono text-lg font-bold text-foreground">{topCandidate.protein_type}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground mb-0.5">Predicted pKd</p>
-                <p className="font-mono text-lg font-bold text-accent">{data.top_candidate.predicted_pkd.toFixed(5)}</p>
+                <p className="font-mono text-lg font-bold text-accent">{topCandidate.predicted_pkd.toFixed(5)}</p>
               </div>
               <Badge variant="outline" className="gap-1 text-[10px] bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
                 <ShieldCheck className="h-3 w-3" />
-                {data.top_candidate.stability}
+                {topCandidate.stability}
               </Badge>
             </div>
           </div>
@@ -127,7 +81,7 @@ const VirtualScreening = () => {
                 </tr>
               </thead>
               <tbody>
-                {data.results.map((r) => {
+                {results.map((r) => {
                   const isStable = r.stability?.toLowerCase() === "stable";
                   return (
                     <tr key={r.rank} className="border-b border-border/20">

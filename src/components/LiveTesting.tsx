@@ -3,12 +3,28 @@ import { motion } from "framer-motion";
 import { FlaskConical, Play, Atom, Cpu, Layers } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
+import VirtualScreening from "@/components/VirtualScreening";
 
 const EXAMPLE_SMILES = [
   { name: "Aspirin", smiles: "CC(=O)Oc1ccccc1C(=O)O" },
   { name: "Caffeine", smiles: "CN1C=NC2=C1C(=O)N(C(=O)N2C)C" },
   { name: "Ibuprofen", smiles: "CC(C)Cc1ccc(cc1)C(C)C(=O)O" },
 ];
+
+interface TopCandidate {
+  pdb_id: string;
+  protein_type: string;
+  predicted_pkd: number;
+  stability: string;
+}
+
+interface ScreeningResult {
+  rank: number;
+  pdb_id: string;
+  protein_type: string;
+  predicted_pkd: number;
+  stability: string;
+}
 
 interface PredictionResult {
   success: boolean;
@@ -23,6 +39,8 @@ interface PredictionResult {
   message: string;
   model_loaded: boolean;
   protein_target?: string;
+  top_candidate?: TopCandidate;
+  screening_results?: ScreeningResult[];
 }
 
 const LiveTesting = () => {
@@ -182,6 +200,14 @@ const LiveTesting = () => {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Virtual Screening — bound to prediction response */}
+        <div className="mt-10">
+          <VirtualScreening
+            topCandidate={result?.top_candidate ?? null}
+            results={result?.screening_results ?? []}
+          />
         </div>
       </div>
     </section>
