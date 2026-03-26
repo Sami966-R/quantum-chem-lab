@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { FlaskConical, Play, Atom, Cpu, Layers, AlertTriangle } from "lucide-react";
+import { FlaskConical, Play, Atom, Cpu, Layers } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 
@@ -22,6 +22,7 @@ interface PredictionResult {
   confidence: number;
   message: string;
   model_loaded: boolean;
+  protein_target?: string;
 }
 
 const LiveTesting = () => {
@@ -158,12 +159,13 @@ const LiveTesting = () => {
                   <div className="rounded-md bg-muted/50 p-4 text-center">
                     <div className="font-mono text-2xl font-bold text-foreground">{result.confidence.toFixed(1)}%</div>
                     <div className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">Confidence</div>
-                    {result.model_loaded === false && (
-                      <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-yellow-500/20 px-2 py-0.5 text-[10px] font-mono text-yellow-400">
-                        <AlertTriangle className="h-3 w-3" /> Untrained model
-                      </div>
-                    )}
                   </div>
+                </div>
+                <div className="rounded-md bg-muted/50 p-4 text-center">
+                  <div className="font-mono text-lg font-bold text-foreground">
+                    {result.protein_target && result.protein_target !== "Unknown" ? result.protein_target : "Binding Protein"}
+                  </div>
+                  <div className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">Protein Target</div>
                 </div>
                 <div className="rounded-md border border-border/30 bg-muted/20 p-3">
                   <Badge variant="outline" className="mb-1 text-[10px] bg-accent/20 text-accent border-accent/30">
