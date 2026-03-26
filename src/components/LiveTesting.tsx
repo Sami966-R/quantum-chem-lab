@@ -22,6 +22,7 @@ interface PredictionResult {
   confidence: number;
   message: string;
   model_loaded: boolean;
+  protein_target?: string;
 }
 
 const LiveTesting = () => {
