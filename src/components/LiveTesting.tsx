@@ -167,7 +167,6 @@ const LiveTesting = () => {
                   </div>
                   <div className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">Protein Target</div>
                 </div>
-                </div>
                 <div className="rounded-md border border-border/30 bg-muted/20 p-3">
                   <Badge variant="outline" className="mb-1 text-[10px] bg-accent/20 text-accent border-accent/30">
                     {result.mode}
