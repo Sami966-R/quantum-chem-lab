@@ -1,7 +1,9 @@
+import { lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Atom } from "lucide-react";
-import MoleculeCanvas from "@/components/MoleculeCanvas";
+
+const MoleculeCanvas = lazy(() => import("@/components/MoleculeCanvas"));
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -22,9 +24,9 @@ const Landing = () => {
       <div className="relative flex min-h-screen flex-col items-center justify-center px-4">
         {/* Molecule background */}
         <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
-          <div className="w-[500px] h-[500px]">
-            <MoleculeCanvas />
-          </div>
+           <Suspense fallback={null}>
+             <MoleculeCanvas />
+           </Suspense>
         </div>
 
         <motion.div
