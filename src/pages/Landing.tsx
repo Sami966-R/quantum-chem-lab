@@ -24,9 +24,9 @@ const Landing = () => {
       <div className="relative flex min-h-screen flex-col items-center justify-center px-4">
         {/* Molecule background */}
         <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
-          <div className="w-[500px] h-[500px]">
-            <MoleculeCanvas />
-          </div>
+           <Suspense fallback={null}>
+             <MoleculeCanvas />
+           </Suspense>
         </div>
 
         <motion.div
