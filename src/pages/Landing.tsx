@@ -1,7 +1,9 @@
+import { lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Atom } from "lucide-react";
-import MoleculeCanvas from "@/components/MoleculeCanvas";
+
+const MoleculeCanvas = lazy(() => import("@/components/MoleculeCanvas"));
 
 const Landing = () => {
   const navigate = useNavigate();
