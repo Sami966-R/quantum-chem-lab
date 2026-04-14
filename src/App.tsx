@@ -42,6 +42,7 @@ const App = () => (
         </Suspense>
         <PageTimelapse />
       </BrowserRouter>
+      <QuantaCureChat />
     </TooltipProvider>
   </QueryClientProvider>
 );
