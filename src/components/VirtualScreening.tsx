@@ -70,44 +70,56 @@ const VirtualScreening = ({ topCandidate, results }: VirtualScreeningProps) => {
           </div>
 
           {/* Results Table */}
-          <div className="overflow-x-auto">
+          <div className="rounded-lg border border-border/30 overflow-hidden">
+            {/* Sticky header */}
             <table className="w-full text-left font-mono text-xs">
-              <thead>
+              <thead className="bg-muted/60 sticky top-0 z-10">
                 <tr className="border-b border-border/50 text-muted-foreground">
-                  <th className="px-3 py-2">Rank</th>
-                  <th className="px-3 py-2">PDB ID</th>
-                  <th className="px-3 py-2">Protein Type</th>
-                  <th className="px-3 py-2">Predicted pKd</th>
-                  <th className="px-3 py-2">Stability</th>
+                  <th className="px-3 py-2.5 w-16">Rank</th>
+                  <th className="px-3 py-2.5">PDB ID</th>
+                  <th className="px-3 py-2.5">Protein Type</th>
+                  <th className="px-3 py-2.5">Predicted pKd</th>
+                  <th className="px-3 py-2.5 w-28">Stability</th>
                 </tr>
               </thead>
-              <tbody>
-                {results.map((r) => {
-                  const isStable = r.stability?.toLowerCase() === "stable";
-                  return (
-                    <tr key={r.rank} className="border-b border-border/20">
-                      <td className="px-3 py-2.5 text-muted-foreground">{r.rank}</td>
-                      <td className="px-3 py-2.5 text-foreground font-medium">{r.pdb_id}</td>
-                      <td className="px-3 py-2.5 text-muted-foreground">{r.protein_type}</td>
-                      <td className="px-3 py-2.5 text-accent font-semibold">{r.predicted_pkd.toFixed(6)}</td>
-                      <td className="px-3 py-2.5">
-                        <Badge
-                          variant="outline"
-                          className={`gap-1 text-[10px] ${
-                            isStable
-                              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
-                              : "bg-red-500/20 text-red-400 border-red-500/30"
-                          }`}
-                        >
-                          {isStable ? <ShieldCheck className="h-3 w-3" /> : <ShieldAlert className="h-3 w-3" />}
-                          {r.stability}
-                        </Badge>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
             </table>
+            {/* Scrollable body — shows ~10 rows */}
+            <ScrollArea className="h-[360px]">
+              <table className="w-full text-left font-mono text-xs">
+                <tbody>
+                  {results.map((r, i) => {
+                    const isStable = r.stability?.toLowerCase() === "stable";
+                    return (
+                      <motion.tr
+                        key={r.rank}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.012, duration: 0.25 }}
+                        className="border-b border-border/10 hover:bg-muted/30 transition-colors group"
+                      >
+                        <td className="px-3 py-2.5 w-16 text-muted-foreground/60 group-hover:text-muted-foreground">{r.rank}</td>
+                        <td className="px-3 py-2.5 text-foreground font-medium">{r.pdb_id}</td>
+                        <td className="px-3 py-2.5 text-muted-foreground">{r.protein_type}</td>
+                        <td className="px-3 py-2.5 text-accent font-semibold">{r.predicted_pkd.toFixed(6)}</td>
+                        <td className="px-3 py-2.5 w-28">
+                          <Badge
+                            variant="outline"
+                            className={`gap-1 text-[10px] ${
+                              isStable
+                                ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+                                : "bg-red-500/20 text-red-400 border-red-500/30"
+                            }`}
+                          >
+                            {isStable ? <ShieldCheck className="h-3 w-3" /> : <ShieldAlert className="h-3 w-3" />}
+                            {r.stability}
+                          </Badge>
+                        </td>
+                      </motion.tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </ScrollArea>
           </div>
         </motion.div>
       )}
