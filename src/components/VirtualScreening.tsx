@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { Trophy, ShieldCheck, ShieldAlert } from "lucide-react";
+import { Trophy, ShieldCheck, ShieldAlert, FlaskConical } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 
 interface TopCandidate {
