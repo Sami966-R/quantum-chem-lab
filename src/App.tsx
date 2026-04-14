@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PageTimelapse from "./components/PageTimelapse";
+import QuantaCureChat from "./components/QuantaCureChat";
 
 const Landing = lazy(() => import("./pages/Landing"));
 const Overview = lazy(() => import("./pages/Overview"));
