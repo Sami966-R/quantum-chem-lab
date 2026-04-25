@@ -80,15 +80,19 @@ const MoleculePredictor = () => {
       ];
       const res = await fetch(`${API_URL}/batch-predict`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ smiles_list }),
+        headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
+        body: JSON.stringify({ smiles_list, molecules: smiles_list }),
       });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`HTTP ${res.status}: ${text.slice(0, 200)}`);
+      }
       const data = await res.json();
       setPredictions(data.predictions || []);
       setError(null);
-    } catch (e) {
+    } catch (e: any) {
       console.error("Predictions fetch error:", e);
-      setError("Could not connect to the API. Make sure the backend is running.");
+      setError(e.message || "Could not connect to the API. Make sure the backend is running.");
     }
   };
 
