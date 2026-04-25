@@ -6,27 +6,30 @@ const API_URL = import.meta.env.VITE_API_URL || "https://fastapi-backend-3-wqvz.
 const PAGES = ["ChEMBL", "Predictions", "PBDBind"] as const;
 
 interface ChemblMol {
-  image?: string;
-  chembl_id?: string;
-  canonical_smiles?: string;
+  chembl_id: string;
+  smiles: string;
+  image: string;
 }
 
-interface PdbbindLig {
-  image?: string;
-  pdb_id?: string;
-  resolution?: string;
+interface PdbbindEntry {
+  pdb_id: string;
+  resolution?: string | number;
   binding_affinity?: number;
 }
 
 interface Prediction {
   name?: string;
-  smiles?: string;
+  smiles: string;
   predicted_pKd?: number;
+  predicted_pkd?: number;
+  affinity?: number;
+  energy?: number;
+  mode?: string;
 }
 
 const MoleculePredictor = () => {
-  const [chemblImage, setChemblImage] = useState<string | null>(null);
-  const [pdbbindImage, setPdbbindImage] = useState<string | null>(null);
+  const [chemblMols, setChemblMols] = useState<ChemblMol[]>([]);
+  const [pdbbindEntries, setPdbbindEntries] = useState<PdbbindEntry[]>([]);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
@@ -34,68 +37,81 @@ const MoleculePredictor = () => {
 
   const fetchChEMBL = async () => {
     try {
-      const res = await fetch(`${API_URL}/chembl?count=6`, {
+      const res = await fetch(`${API_URL}/chembl?count=12`, {
         headers: { "ngrok-skip-browser-warning": "true" },
       });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      if (data.error) {
-        setError(data.error);
-      } else {
-        setChemblImage(data.image || null);
-        setError(null);
-      }
-    } catch (e) {
+      // Direct array response
+      setChemblMols(Array.isArray(data) ? data : []);
+      setError(null);
+    } catch (e: any) {
       console.error("ChEMBL fetch error:", e);
-      setError("Could not connect to the API. Make sure the backend is running.");
+      setError(e.message || "Could not connect to the API.");
     }
   };
 
   const fetchPDBbind = async () => {
     try {
-      const res = await fetch(`${API_URL}/pdbbind?count=6`, {
+      const res = await fetch(`${API_URL}/pdbbind?count=12`, {
         headers: { "ngrok-skip-browser-warning": "true" },
       });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      if (data.error) {
-        setError(data.error);
-      } else {
-        setPdbbindImage(data.image || null);
-        setError(null);
-      }
-    } catch (e) {
+      // Direct array response
+      setPdbbindEntries(Array.isArray(data) ? data : []);
+      setError(null);
+    } catch (e: any) {
       console.error("PBDBind fetch error:", e);
-      setError("Could not connect to the API. Make sure the backend is running.");
+      setError(e.message || "Could not connect to the API.");
     }
   };
 
   const fetchPredictions = async () => {
     try {
-      const smiles_list = [
-        "CC(=O)Oc1ccccc1C(=O)O",
-        "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
-        "CC(C)Cc1ccc(cc1)C(C)C(=O)O",
-        "CC(C)CC(CC(=O)O)N",
-        "c1ccccc1",
-        "CCO",
+      const moleculeList = [
+        { name: "Aspirin", smiles: "CC(=O)Oc1ccccc1C(=O)O" },
+        { name: "Caffeine", smiles: "CN1C=NC2=C1C(=O)N(C(=O)N2C)C" },
+        { name: "Ibuprofen", smiles: "CC(C)Cc1ccc(cc1)C(C)C(=O)O" },
+        { name: "Leucine", smiles: "CC(C)CC(CC(=O)O)N" },
+        { name: "Benzene", smiles: "c1ccccc1" },
+        { name: "Ethanol", smiles: "CCO" },
       ];
-      const res = await fetch(`${API_URL}/batch-predict`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
-        body: JSON.stringify({ smiles_list, molecules: smiles_list }),
-      });
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`HTTP ${res.status}: ${text.slice(0, 200)}`);
-      }
-      const data = await res.json();
-      setPredictions(data.predictions || []);
+
+      // Run individual /predict requests in parallel — backend's batch endpoint expects different schema
+      const results = await Promise.all(
+        moleculeList.map(async (mol) => {
+          try {
+            const res = await fetch(`${API_URL}/predict`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "ngrok-skip-browser-warning": "true",
+              },
+              body: JSON.stringify({ smiles: mol.smiles, mode: "Hybrid" }),
+            });
+            if (!res.ok) return null;
+            const data = await res.json();
+            return {
+              name: mol.name,
+              smiles: mol.smiles,
+              predicted_pKd: data.affinity ?? data.predicted_pkd ?? data.predicted_pKd,
+              energy: data.energy,
+              mode: data.mode,
+            } as Prediction;
+          } catch {
+            return null;
+          }
+        })
+      );
+
+      setPredictions(results.filter((r): r is Prediction => r !== null));
       setError(null);
     } catch (e: any) {
       console.error("Predictions fetch error:", e);
-      setError(e.message || "Could not connect to the API. Make sure the backend is running.");
+      setError(e.message || "Could not connect to the API.");
     }
   };
-
 
   useEffect(() => {
     setLoading(true);
@@ -127,15 +143,38 @@ const MoleculePredictor = () => {
       case "ChEMBL":
         return (
           <div>
-            <h3 className="mb-6 font-mono text-lg font-bold text-foreground">ChEMBL Molecules (Real Data)</h3>
-            {chemblImage ? (
-              <img
-                src={`data:image/png;base64,${chemblImage}`}
-                alt="ChEMBL Molecular Grid"
-                className="w-full rounded-lg"
-              />
-            ) : (
+            <h3 className="mb-6 font-mono text-lg font-bold text-foreground">
+              ChEMBL Molecules ({chemblMols.length})
+            </h3>
+            {chemblMols.length === 0 ? (
               <p className="text-sm text-muted-foreground">No molecule data loaded</p>
+            ) : (
+              <div className="max-h-[32rem] overflow-y-auto pr-2">
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                  {chemblMols.map((mol) => (
+                    <div
+                      key={mol.chembl_id}
+                      className="glass-card overflow-hidden p-3 transition-all hover:ring-1 hover:ring-accent/50"
+                    >
+                      {mol.image && (
+                        <div className="rounded-md bg-white p-2">
+                          <img
+                            src={mol.image}
+                            alt={mol.chembl_id}
+                            className="mx-auto h-32 w-full object-contain"
+                          />
+                        </div>
+                      )}
+                      <p className="mt-2 truncate font-mono text-xs font-bold text-accent">
+                        {mol.chembl_id}
+                      </p>
+                      <p className="truncate font-mono text-[10px] text-muted-foreground">
+                        {mol.smiles}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         );
@@ -143,22 +182,26 @@ const MoleculePredictor = () => {
       case "Predictions":
         return (
           <div>
-            <h3 className="mb-6 font-mono text-lg font-bold text-foreground">Binding Affinity Predictions (Real Data)</h3>
+            <h3 className="mb-6 font-mono text-lg font-bold text-foreground">
+              Binding Affinity Predictions
+            </h3>
             {predictions.length === 0 ? (
               <p className="text-sm text-muted-foreground">No predictions available</p>
             ) : (
               <div className="space-y-3">
                 {predictions.map((pred, idx) => (
                   <div key={idx} className="glass-card flex items-center justify-between p-4">
-                    <div>
+                    <div className="min-w-0 flex-1">
                       <p className="font-mono text-sm font-bold text-foreground">
                         {pred.name || `Molecule ${idx + 1}`}
                       </p>
-                      <p className="font-mono text-[10px] text-muted-foreground">{pred.smiles}</p>
+                      <p className="truncate font-mono text-[10px] text-muted-foreground">
+                        {pred.smiles}
+                      </p>
                     </div>
-                    <div className="text-right">
+                    <div className="ml-4 text-right">
                       <p className="font-mono text-2xl font-bold text-accent">
-                        {pred.predicted_pKd?.toFixed(3)}
+                        {pred.predicted_pKd?.toFixed(3) ?? "—"}
                       </p>
                       <p className="font-mono text-[10px] text-muted-foreground">pKd/pKi</p>
                     </div>
@@ -172,15 +215,34 @@ const MoleculePredictor = () => {
       case "PBDBind":
         return (
           <div>
-            <h3 className="mb-6 font-mono text-lg font-bold text-foreground">PDBbind Protein-Ligand Complexes (Real Data)</h3>
-            {pdbbindImage ? (
-              <img
-                src={`data:image/png;base64,${pdbbindImage}`}
-                alt="PDBbind Ligand Grid"
-                className="w-full rounded-lg"
-              />
-            ) : (
+            <h3 className="mb-6 font-mono text-lg font-bold text-foreground">
+              PDBbind Protein-Ligand Complexes ({pdbbindEntries.length})
+            </h3>
+            {pdbbindEntries.length === 0 ? (
               <p className="text-sm text-muted-foreground">No ligand data loaded</p>
+            ) : (
+              <div className="max-h-[32rem] overflow-y-auto pr-2">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                  {pdbbindEntries.map((entry, idx) => (
+                    <div
+                      key={`${entry.pdb_id}-${idx}`}
+                      className="glass-card flex flex-col items-center justify-center p-4 transition-all hover:ring-1 hover:ring-accent/50"
+                    >
+                      <p className="font-mono text-lg font-bold uppercase text-accent">
+                        {entry.pdb_id}
+                      </p>
+                      <p className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">
+                        PDB ID
+                      </p>
+                      {entry.binding_affinity !== undefined && (
+                        <p className="mt-2 font-mono text-xs text-foreground">
+                          {entry.binding_affinity.toFixed(2)}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         );
