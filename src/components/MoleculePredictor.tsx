@@ -97,8 +97,10 @@ const MoleculePredictor = () => {
             return {
               name: mol.name,
               smiles: mol.smiles,
-              predicted_pKd: data.affinity ?? data.predicted_pkd ?? data.predicted_pKd,
+              affinity: data.affinity,
               energy: data.energy,
+              stability_score: data.stability_score,
+              confidence: data.confidence,
               mode: data.mode,
             } as Prediction;
           } catch {
