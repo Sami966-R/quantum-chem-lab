@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import VirtualScreening from "@/components/VirtualScreening";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://dentoid-afflictively-maia.ngrok-free.dev";
+const API_URL = import.meta.env.VITE_API_URL || "https://fastapi-backend-3-wqvz.onrender.com";
 const HEADERS = { "ngrok-skip-browser-warning": "true" };
 
 const QuantumPage = () => {
