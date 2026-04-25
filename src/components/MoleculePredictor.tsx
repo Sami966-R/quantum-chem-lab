@@ -13,6 +13,8 @@ interface ChemblMol {
 
 interface PdbbindEntry {
   pdb_id: string;
+  smiles?: string;
+  image?: string;
   resolution?: string | number;
   binding_affinity?: number;
 }
@@ -222,23 +224,27 @@ const MoleculePredictor = () => {
               <p className="text-sm text-muted-foreground">No ligand data loaded</p>
             ) : (
               <div className="max-h-[32rem] overflow-y-auto pr-2">
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                   {pdbbindEntries.map((entry, idx) => (
                     <div
                       key={`${entry.pdb_id}-${idx}`}
-                      className="glass-card flex flex-col items-center justify-center p-4 transition-all hover:ring-1 hover:ring-accent/50"
+                      className="glass-card overflow-hidden p-3 transition-all hover:ring-1 hover:ring-accent/50"
                     >
-                      <p className="font-mono text-lg font-bold uppercase text-accent">
+                      {entry.image && (
+                        <div className="rounded-md bg-white p-2">
+                          <img
+                            src={entry.image}
+                            alt={entry.pdb_id}
+                            className="mx-auto h-32 w-full object-contain"
+                          />
+                        </div>
+                      )}
+                      <p className="mt-2 truncate font-mono text-xs font-bold uppercase text-accent">
                         {entry.pdb_id}
                       </p>
-                      <p className="mt-1 font-mono text-[10px] uppercase text-muted-foreground">
-                        PDB ID
+                      <p className="truncate font-mono text-[10px] text-muted-foreground">
+                        {entry.smiles || "—"}
                       </p>
-                      {entry.binding_affinity !== undefined && (
-                        <p className="mt-2 font-mono text-xs text-foreground">
-                          {entry.binding_affinity.toFixed(2)}
-                        </p>
-                      )}
                     </div>
                   ))}
                 </div>
