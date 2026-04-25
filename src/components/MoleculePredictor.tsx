@@ -194,7 +194,7 @@ const MoleculePredictor = () => {
             ) : (
               <div className="space-y-3">
                 {predictions.map((pred, idx) => (
-                  <div key={idx} className="glass-card flex items-center justify-between p-4">
+                  <div key={idx} className="glass-card flex items-center justify-between gap-4 p-4">
                     <div className="min-w-0 flex-1">
                       <p className="font-mono text-sm font-bold text-foreground">
                         {pred.name || `Molecule ${idx + 1}`}
@@ -202,12 +202,40 @@ const MoleculePredictor = () => {
                       <p className="truncate font-mono text-[10px] text-muted-foreground">
                         {pred.smiles}
                       </p>
+                      <div className="mt-2 flex flex-wrap gap-3 font-mono text-[10px] text-muted-foreground">
+                        {pred.energy !== undefined && (
+                          <span>
+                            Energy:{" "}
+                            <span className="text-foreground">{pred.energy.toFixed(3)}</span>
+                          </span>
+                        )}
+                        {pred.confidence !== undefined && (
+                          <span>
+                            Confidence:{" "}
+                            <span className="text-foreground">{pred.confidence.toFixed(1)}%</span>
+                          </span>
+                        )}
+                        {pred.mode && (
+                          <span>
+                            Mode: <span className="text-foreground">{pred.mode}</span>
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className="ml-4 text-right">
-                      <p className="font-mono text-2xl font-bold text-accent">
-                        {pred.predicted_pKd?.toFixed(3) ?? "—"}
-                      </p>
-                      <p className="font-mono text-[10px] text-muted-foreground">pKd/pKi</p>
+                    <div className="flex shrink-0 items-stretch gap-3">
+                      <div className="text-right">
+                        <p className="font-mono text-2xl font-bold text-accent">
+                          {pred.affinity?.toFixed(3) ?? "—"}
+                        </p>
+                        <p className="font-mono text-[10px] text-muted-foreground">Affinity</p>
+                      </div>
+                      <div className="w-px bg-border/50" />
+                      <div className="text-right">
+                        <p className="font-mono text-2xl font-bold text-primary">
+                          {pred.stability_score?.toFixed(1) ?? "—"}
+                        </p>
+                        <p className="font-mono text-[10px] text-muted-foreground">Stability</p>
+                      </div>
                     </div>
                   </div>
                 ))}
