@@ -22,10 +22,10 @@ interface PdbbindEntry {
 interface Prediction {
   name?: string;
   smiles: string;
-  predicted_pKd?: number;
-  predicted_pkd?: number;
   affinity?: number;
   energy?: number;
+  stability_score?: number;
+  confidence?: number;
   mode?: string;
 }
 
