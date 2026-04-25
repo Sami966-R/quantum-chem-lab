@@ -8,7 +8,7 @@ import { BarChart3, RefreshCw, AlertCircle } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://dentoid-afflictively-maia.ngrok-free.dev";
+const API_URL = import.meta.env.VITE_API_URL || "https://fastapi-backend-3-wqvz.onrender.com";
 const HEADERS = { "ngrok-skip-browser-warning": "true" };
 
 function useFetch<T>(endpoint: string) {

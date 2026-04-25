@@ -7,7 +7,7 @@ import {
 import { Brain, TrendingUp, Activity, Target, BarChart3, RefreshCw, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://dentoid-afflictively-maia.ngrok-free.dev";
+const API_URL = import.meta.env.VITE_API_URL || "https://fastapi-backend-3-wqvz.onrender.com";
 const HEADERS = { "ngrok-skip-browser-warning": "true" };
 const POLL_INTERVAL = 30000;
 
