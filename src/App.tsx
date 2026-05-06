@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PageTimelapse from "./components/PageTimelapse";
 import QuantaCureChat from "./components/QuantaCureChat";
+import ParticleBackground from "./components/ParticleBackground";
+import GlowCursor from "./components/GlowCursor";
 
 const Landing = lazy(() => import("./pages/Landing"));
 const Overview = lazy(() => import("./pages/Overview"));
@@ -15,6 +17,7 @@ const ResultsPage = lazy(() => import("./pages/ResultsPage"));
 const MoleculeTestingPage = lazy(() => import("./pages/MoleculeTestingPage"));
 const ErrorAnalysisPage = lazy(() => import("./pages/ErrorAnalysisPage"));
 const QuantumPage = lazy(() => import("./pages/QuantumPage"));
+const DrugPage = lazy(() => import("./pages/DrugPage"));
 const TeamPage = lazy(() => import("./pages/TeamPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -26,6 +29,8 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ParticleBackground />
+        <GlowCursor />
         <Suspense fallback={<div className="min-h-screen bg-background" />}>
           <Routes>
             <Route path="/" element={<Landing />} />
@@ -36,6 +41,7 @@ const App = () => (
             <Route path="/molecule-testing" element={<MoleculeTestingPage />} />
             <Route path="/error-analysis" element={<ErrorAnalysisPage />} />
             <Route path="/quantum" element={<QuantumPage />} />
+            <Route path="/drug" element={<DrugPage />} />
             <Route path="/team" element={<TeamPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

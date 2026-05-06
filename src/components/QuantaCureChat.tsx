@@ -89,33 +89,41 @@ export default function QuantaCureChat() {
       </button>
 
       {open && (
-        <div className="fixed bottom-24 right-6 z-50 w-[370px] max-h-[520px] flex flex-col rounded-2xl border border-white/10 bg-[#0f0f1a] shadow-2xl overflow-hidden">
+        <div className="fixed bottom-24 right-6 z-50 w-[370px] max-h-[520px] flex flex-col rounded-2xl overflow-hidden p-[1.5px] bg-gradient-to-br from-cyan-400 via-purple-500 to-green-400 shadow-[0_0_40px_rgba(0,212,255,0.4)] animate-pulse-glow">
+          <div className="flex flex-col h-full rounded-2xl bg-[#0a0a1a] overflow-hidden">
           {/* Header */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10 bg-gradient-to-r from-violet-900/60 to-indigo-900/60">
-            <div className="w-9 h-9 rounded-full bg-violet-600 flex items-center justify-center">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-cyan-500/20 bg-gradient-to-r from-purple-900/40 to-cyan-900/40">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center shadow-[0_0_15px_rgba(0,212,255,0.5)]">
               <Bot size={18} className="text-white" />
             </div>
-            <div>
+            <div className="flex-1">
               <p className="text-sm font-semibold text-white">QuantaCure Assistant</p>
-              <p className="text-[10px] text-violet-300">Powered by RAG · Project Knowledge Base</p>
+              <p className="text-[10px] text-cyan-300">Powered by RAG · Project Knowledge Base</p>
+            </div>
+            <div className="flex items-center gap-1.5 rounded-full bg-green-500/15 px-2 py-0.5 border border-green-400/40">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-400" />
+              </span>
+              <span className="text-[9px] font-mono uppercase tracking-wider text-green-300">AI Online</span>
             </div>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4 scrollbar-thin">
             {messages.map((msg, i) => (
               <div key={i} className={`flex gap-2 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
                 <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center bg-white/10 mt-0.5">
-                  {msg.role === "user" ? <User size={14} className="text-violet-300" /> : <Bot size={14} className="text-violet-400" />}
+                  {msg.role === "user" ? <User size={14} className="text-purple-300" /> : <Bot size={14} className="text-cyan-300" />}
                 </div>
                 <div className="max-w-[80%] space-y-1">
-                  <div className={`text-sm leading-relaxed px-3 py-2 rounded-xl ${msg.role === "user" ? "bg-violet-600 text-white" : "bg-white/8 text-gray-200"}`}>
+                  <div className={`text-sm leading-relaxed px-3 py-2 rounded-xl ${msg.role === "user" ? "bg-gradient-to-br from-purple-600 to-purple-700 text-white" : "bg-gradient-to-br from-cyan-600/30 to-cyan-700/20 text-gray-100 border border-cyan-500/20"}`}>
                     {msg.content}
                   </div>
                   {msg.sources && msg.sources.length > 0 && (
                     <div className="flex flex-wrap gap-1 px-1">
                       {msg.sources.map((s, j) => (
-                        <span key={j} className="text-[10px] px-1.5 py-0.5 rounded bg-violet-900/50 text-violet-300 border border-violet-700/40">
+                        <span key={j} className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-900/50 text-cyan-300 border border-cyan-700/40">
                           {s}
                         </span>
                       ))}
@@ -128,10 +136,12 @@ export default function QuantaCureChat() {
             {loading && (
               <div className="flex gap-2">
                 <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center bg-white/10">
-                  <Bot size={14} className="text-violet-400" />
+                  <Bot size={14} className="text-cyan-300" />
                 </div>
-                <div className="px-3 py-2 rounded-xl bg-white/8">
-                  <Loader2 size={16} className="animate-spin text-violet-400" />
+                <div className="px-3 py-2.5 rounded-xl bg-gradient-to-br from-cyan-600/30 to-cyan-700/20 border border-cyan-500/20 flex items-center gap-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                  <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "300ms" }} />
                 </div>
               </div>
             )}
@@ -175,6 +185,7 @@ export default function QuantaCureChat() {
             >
               <Send size={15} className="text-white" />
             </button>
+          </div>
           </div>
         </div>
       )}
