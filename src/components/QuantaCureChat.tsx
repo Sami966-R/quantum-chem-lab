@@ -188,7 +188,6 @@ export default function QuantaCureChat() {
           </div>
           </div>
         </div>
-      )}
     </>
   );
 }
