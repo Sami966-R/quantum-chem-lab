@@ -28,6 +28,17 @@ const DrugPage = () => {
           binding affinity, stability, and drug potential.
         </motion.p>
       </section>
+      <div className="mt-12 flex justify-center">
+  import { motion } from "framer-motion";
+
+<motion.img
+  src="/quantum-drug-ai.png"
+  alt="Quantum Drug Discovery Pipeline"
+  initial={{ opacity: 0, scale: 0.9 }}
+  animate={{ opacity: 1, scale: 1 }}
+  transition={{ duration: 0.6 }}
+  className="rounded-xl max-w-4xl w-full shadow-[0_0_40px_rgba(0,212,255,0.3)]"
+/>
 
       {/* PIPELINE */}
       <section className="container mx-auto px-6 py-12 grid md:grid-cols-4 gap-6">
