@@ -29,10 +29,8 @@ const DrugPage = () => {
         </motion.p>
       </section>
       <div className="mt-12 flex justify-center">
-  import { motion } from "framer-motion";
-
-<motion.img
-  src="../public/Drug_Discovery using Hybrid_AI-1.jpg"
+ <motion.img
+  src="/Drug_Discovery_using_Hybrid_AI_1.jpg"
   alt="Quantum Drug Discovery Pipeline"
   initial={{ opacity: 0, scale: 0.9 }}
   animate={{ opacity: 1, scale: 1 }}
