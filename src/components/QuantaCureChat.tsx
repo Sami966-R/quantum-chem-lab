@@ -186,6 +186,7 @@ export default function QuantaCureChat() {
               <Send size={15} className="text-white" />
             </button>
           </div>
+          </div>
         </div>
       )}
     </>
