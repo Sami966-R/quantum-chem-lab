@@ -4,7 +4,7 @@ import Navigation from "@/components/Navigation";
 import SiteFooter from "@/components/SiteFooter";
 
 const team = [
-  { name: "Muhammad Samiullah", role: "Front End Developer" },
+  { name: "Muhammad Samiullah", role: "Technical Lead" },
   { name: "Muhammad Danish Nadeem", role: "ML Engineer" },
   { name: "Safwaan Saleem", role: "Lead Researcher" },
 ];
