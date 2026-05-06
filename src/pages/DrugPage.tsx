@@ -32,7 +32,7 @@ const DrugPage = () => {
   import { motion } from "framer-motion";
 
 <motion.img
-  src="/quantum-drug-ai.png"
+  src="/Drug_Discovery using Hybrid_AI-1.jpg"
   alt="Quantum Drug Discovery Pipeline"
   initial={{ opacity: 0, scale: 0.9 }}
   animate={{ opacity: 1, scale: 1 }}
