@@ -9,7 +9,7 @@ const MoleculeTestingPage = () => {
 
       <div className="pt-24 space-y-16">
         <div className="text-center">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-cyan-400 to-green-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
             Live Molecule Testing Lab
           </h1>
           <p className="text-gray-400 mt-4">

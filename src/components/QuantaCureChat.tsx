@@ -92,7 +92,7 @@ export default function QuantaCureChat() {
         <div className="fixed bottom-24 right-6 z-50 w-[370px] max-h-[520px] flex flex-col rounded-2xl overflow-hidden p-[1.5px] bg-gradient-to-br from-cyan-400 via-purple-500 to-green-400 shadow-[0_0_40px_rgba(0,212,255,0.4)] animate-pulse-glow">
           <div className="flex flex-col h-full rounded-2xl bg-[#0a0a1a] overflow-hidden">
           {/* Header */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-cyan-500/20 bg-gradient-to-r from-purple-900/40 to-cyan-900/40">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-orange-500/20 bg-gradient-to-r from-purple-900/40 to-cyan-900/40">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center shadow-[0_0_15px_rgba(0,212,255,0.5)]">
               <Bot size={18} className="text-white" />
             </div>
@@ -117,7 +117,7 @@ export default function QuantaCureChat() {
                   {msg.role === "user" ? <User size={14} className="text-purple-300" /> : <Bot size={14} className="text-cyan-300" />}
                 </div>
                 <div className="max-w-[80%] space-y-1">
-                  <div className={`text-sm leading-relaxed px-3 py-2 rounded-xl ${msg.role === "user" ? "bg-gradient-to-br from-purple-600 to-purple-700 text-white" : "bg-gradient-to-br from-cyan-600/30 to-cyan-700/20 text-gray-100 border border-cyan-500/20"}`}>
+                  <div className={`text-sm leading-relaxed px-3 py-2 rounded-xl ${msg.role === "user" ? "bg-gradient-to-br from-purple-600 to-purple-700 text-white" : "bg-gradient-to-br from-cyan-600/30 to-cyan-700/20 text-gray-100 border border-orange-500/20"}`}>
                     {msg.content}
                   </div>
                   {msg.sources && msg.sources.length > 0 && (
@@ -138,7 +138,7 @@ export default function QuantaCureChat() {
                 <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center bg-white/10">
                   <Bot size={14} className="text-cyan-300" />
                 </div>
-                <div className="px-3 py-2.5 rounded-xl bg-gradient-to-br from-cyan-600/30 to-cyan-700/20 border border-cyan-500/20 flex items-center gap-1">
+                <div className="px-3 py-2.5 rounded-xl bg-gradient-to-br from-cyan-600/30 to-cyan-700/20 border border-orange-500/20 flex items-center gap-1">
                   <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "0ms" }} />
                   <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "150ms" }} />
                   <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "300ms" }} />

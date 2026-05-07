@@ -1,5 +1,12 @@
 import { useEffect, useRef } from "react";
 
+/**
+ * Animated canvas-based hexagonal molecule network.
+ * - Glowing double-ring hexagons in orange (#f97316) and purple (#7b2ff7)
+ * - Deep #0a0a1a background with subtle radial purple ambient
+ * - Slow drift, thin connection lines, pulsing glow
+ * - Fixed behind all content, non-interactive
+ */
 export default function ParticleBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -17,14 +24,18 @@ export default function ParticleBackground() {
     window.addEventListener("resize", resize);
 
     interface Hex {
-      x: number; y: number; r: number;
-      vx: number; vy: number;
-      color: string; alpha: number; pulse: number;
+      x: number;
+      y: number;
+      r: number;
+      vx: number;
+      vy: number;
+      color: string;
+      alpha: number;
+      pulse: number;
     }
 
-    const hexagons: Hex[] = [];
     const COUNT = 45;
-
+    const hexagons: Hex[] = [];
     for (let i = 0; i < COUNT; i++) {
       hexagons.push({
         x: Math.random() * canvas.width,
@@ -38,102 +49,90 @@ export default function ParticleBackground() {
       });
     }
 
-    function drawHex(
-      x: number, y: number, r: number,
-      color: string, alpha: number
-    ) {
-      ctx!.beginPath();
+    const hexPath = (cx: number, cy: number, r: number) => {
+      ctx.beginPath();
       for (let i = 0; i < 6; i++) {
-        const angle = (Math.PI / 3) * i - Math.PI / 6;
-        const px = x + r * Math.cos(angle);
-        const py = y + r * Math.sin(angle);
-        i === 0 ? ctx!.moveTo(px, py) : ctx!.lineTo(px, py);
+        const a = (Math.PI / 3) * i - Math.PI / 6;
+        const px = cx + r * Math.cos(a);
+        const py = cy + r * Math.sin(a);
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
       }
-      ctx!.closePath();
-      ctx!.globalAlpha = alpha;
-      ctx!.strokeStyle = color;
-      ctx!.lineWidth = 1.4;
-      ctx!.shadowColor = color;
-      ctx!.shadowBlur = 10;
-      ctx!.stroke();
+      ctx.closePath();
+    };
 
-      // inner smaller hex for double-ring effect like the image
-      ctx!.beginPath();
-      const inner = r * 0.6;
-      for (let i = 0; i < 6; i++) {
-        const angle = (Math.PI / 3) * i - Math.PI / 6;
-        const px = x + inner * Math.cos(angle);
-        const py = y + inner * Math.sin(angle);
-        i === 0 ? ctx!.moveTo(px, py) : ctx!.lineTo(px, py);
-      }
-      ctx!.closePath();
-      ctx!.globalAlpha = alpha * 0.5;
-      ctx!.strokeStyle = color;
-      ctx!.lineWidth = 0.6;
-      ctx!.shadowBlur = 4;
-      ctx!.stroke();
-    }
+    const drawHex = (h: Hex, alpha: number) => {
+      // Outer ring
+      hexPath(h.x, h.y, h.r);
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = h.color;
+      ctx.lineWidth = 1.4;
+      ctx.shadowColor = h.color;
+      ctx.shadowBlur = 12;
+      ctx.stroke();
 
-    function drawConnections() {
+      // Inner ring (double-ring effect)
+      hexPath(h.x, h.y, h.r * 0.6);
+      ctx.globalAlpha = alpha * 0.5;
+      ctx.lineWidth = 0.6;
+      ctx.shadowBlur = 4;
+      ctx.stroke();
+    };
+
+    const drawConnections = () => {
       for (let i = 0; i < hexagons.length; i++) {
         for (let j = i + 1; j < hexagons.length; j++) {
           const dx = hexagons[i].x - hexagons[j].x;
           const dy = hexagons[i].y - hexagons[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < 200) {
-            ctx!.beginPath();
-            ctx!.moveTo(hexagons[i].x, hexagons[i].y);
-            ctx!.lineTo(hexagons[j].x, hexagons[j].y);
-            ctx!.strokeStyle = hexagons[i].color;
-            ctx!.globalAlpha = (1 - dist / 200) * 0.18;
-            ctx!.lineWidth = 0.6;
-            ctx!.shadowBlur = 3;
-            ctx!.shadowColor = hexagons[i].color;
-            ctx!.stroke();
+            ctx.beginPath();
+            ctx.moveTo(hexagons[i].x, hexagons[i].y);
+            ctx.lineTo(hexagons[j].x, hexagons[j].y);
+            ctx.strokeStyle = hexagons[i].color;
+            ctx.globalAlpha = (1 - dist / 200) * 0.18;
+            ctx.lineWidth = 0.6;
+            ctx.shadowBlur = 3;
+            ctx.shadowColor = hexagons[i].color;
+            ctx.stroke();
           }
         }
       }
-    }
+    };
 
-    // Glowing spark dots at hex vertices occasionally
-    function drawSparks() {
+    const drawSparks = () => {
       hexagons.forEach((h, idx) => {
-        if (idx % 7 === 0) {
-          const angle = (Math.PI / 3) * Math.floor(h.pulse) - Math.PI / 6;
-          const px = h.x + h.r * Math.cos(angle);
-          const py = h.y + h.r * Math.sin(angle);
-          ctx!.beginPath();
-          ctx!.arc(px, py, 2.5, 0, Math.PI * 2);
-          ctx!.fillStyle = "#ffffff";
-          ctx!.globalAlpha = 0.6 + Math.sin(h.pulse * 3) * 0.3;
-          ctx!.shadowColor = h.color;
-          ctx!.shadowBlur = 12;
-          ctx!.fill();
-        }
+        if (idx % 7 !== 0) return;
+        const a = (Math.PI / 3) * Math.floor(h.pulse) - Math.PI / 6;
+        const px = h.x + h.r * Math.cos(a);
+        const py = h.y + h.r * Math.sin(a);
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff";
+        ctx.globalAlpha = 0.6 + Math.sin(h.pulse * 3) * 0.3;
+        ctx.shadowColor = h.color;
+        ctx.shadowBlur = 12;
+        ctx.fill();
       });
-    }
+    };
 
-    let animFrame: number;
+    let raf: number;
+    const animate = () => {
+      // Background fill
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "#0a0a1a";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    function animate() {
-      ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
-
-      // Deep dark background
-      ctx!.globalAlpha = 1;
-      ctx!.shadowBlur = 0;
-      ctx!.fillStyle = "#0a0a1a";
-      ctx!.fillRect(0, 0, canvas!.width, canvas!.height);
-
-      // Subtle purple ambient glow in center
-      const grad = ctx!.createRadialGradient(
-        canvas!.width / 2, canvas!.height / 2, 0,
-        canvas!.width / 2, canvas!.height / 2, canvas!.width * 0.6
+      // Subtle purple ambient glow
+      const grad = ctx.createRadialGradient(
+        canvas.width / 2, canvas.height / 2, 0,
+        canvas.width / 2, canvas.height / 2, canvas.width * 0.6
       );
       grad.addColorStop(0, "rgba(123,47,247,0.08)");
       grad.addColorStop(1, "rgba(0,0,0,0)");
-      ctx!.globalAlpha = 1;
-      ctx!.fillStyle = grad;
-      ctx!.fillRect(0, 0, canvas!.width, canvas!.height);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       drawConnections();
       drawSparks();
@@ -143,23 +142,22 @@ export default function ParticleBackground() {
         h.y += h.vy;
         h.pulse += 0.018;
 
-        // wrap around edges
-        if (h.x < -80) h.x = canvas!.width + 80;
-        if (h.x > canvas!.width + 80) h.x = -80;
-        if (h.y < -80) h.y = canvas!.height + 80;
-        if (h.y > canvas!.height + 80) h.y = -80;
+        if (h.x < -80) h.x = canvas.width + 80;
+        if (h.x > canvas.width + 80) h.x = -80;
+        if (h.y < -80) h.y = canvas.height + 80;
+        if (h.y > canvas.height + 80) h.y = -80;
 
         const pulseAlpha = h.alpha + Math.sin(h.pulse) * 0.07;
-        drawHex(h.x, h.y, h.r, h.color, Math.max(0.05, pulseAlpha));
+        drawHex(h, Math.max(0.05, pulseAlpha));
       });
 
-      animFrame = requestAnimationFrame(animate);
-    }
+      raf = requestAnimationFrame(animate);
+    };
 
     animate();
 
     return () => {
-      cancelAnimationFrame(animFrame);
+      cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
     };
   }, []);

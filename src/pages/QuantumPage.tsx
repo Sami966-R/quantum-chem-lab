@@ -175,7 +175,7 @@ const QuantumPage = () => (
           <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
           <span className="font-mono text-xs uppercase tracking-widest text-cyan-300">Quantum Drug Discovery</span>
         </div>
-        <h1 className="bg-gradient-to-r from-purple-400 via-cyan-400 to-green-400 bg-clip-text text-4xl font-black text-transparent md:text-6xl">
+        <h1 className="bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400 bg-clip-text text-4xl font-black text-transparent md:text-6xl">
           Quantum Meets Drug Discovery
         </h1>
         {/* FIXED subtitle */}
@@ -218,7 +218,7 @@ const QuantumPage = () => (
     {/* ── FULL ARCHITECTURE SHOWCASE (FIXED: real pipeline) ── */}
     <section className="container mx-auto px-4 py-16">
       <motion.div {...fadeUp} className="text-center mb-12">
-        <h2 className="bg-gradient-to-r from-purple-400 via-cyan-400 to-green-400 bg-clip-text text-3xl font-bold text-transparent md:text-4xl">
+        <h2 className="bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400 bg-clip-text text-3xl font-bold text-transparent md:text-4xl">
           System Architecture
         </h2>
         <p className="mt-3 text-sm text-gray-400">How QuantaCure works end to end — from molecule input to drug candidate output</p>
@@ -232,7 +232,7 @@ const QuantumPage = () => (
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: i * 0.1 }}
-            className="group relative flex flex-col rounded-xl border border-cyan-500/20 bg-white/5 p-5 backdrop-blur-sm transition-all duration-300 hover:border-cyan-400"
+            className="group relative flex flex-col rounded-xl border border-orange-500/20 bg-white/5 p-5 backdrop-blur-sm transition-all duration-300 hover:border-orange-400"
             whileHover={{ boxShadow: `0 0 30px ${s.glow}` }}
           >
             <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br ${s.color} shadow-lg`}>
@@ -265,7 +265,7 @@ const QuantumPage = () => (
     {/* ── PREDICTION MODES (FIXED: real 3 modes with correct confidence scores) ── */}
     <section className="container mx-auto px-4 py-16">
       <motion.div {...fadeUp} className="text-center mb-12">
-        <h2 className="bg-gradient-to-r from-purple-400 via-cyan-400 to-green-400 bg-clip-text text-3xl font-bold text-transparent md:text-4xl">
+        <h2 className="bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400 bg-clip-text text-3xl font-bold text-transparent md:text-4xl">
           Three Prediction Modes
         </h2>
         <p className="mt-3 text-sm text-gray-400">Select the mode in the Molecule Lab — each adds more quantum features</p>
@@ -290,7 +290,7 @@ const QuantumPage = () => (
             <m.icon className={`mb-4 h-10 w-10 ${m.iconColor}`} />
             <h3 className="text-xl font-bold text-white">{m.title}</h3>
             <div className="mt-2 flex items-baseline gap-1">
-              <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-3xl font-black text-transparent">
+              <span className="bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400 bg-clip-text text-3xl font-black text-transparent">
                 {m.confidence}%
               </span>
               <span className="text-xs text-gray-400">confidence</span>
@@ -312,7 +312,7 @@ const QuantumPage = () => (
     <section className="container mx-auto px-4 py-16">
       <motion.h2
         {...fadeUp}
-        className="mb-12 bg-gradient-to-r from-purple-400 via-cyan-400 to-green-400 bg-clip-text text-center text-3xl font-bold text-transparent md:text-4xl"
+        className="mb-12 bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400 bg-clip-text text-center text-3xl font-bold text-transparent md:text-4xl"
       >
         Core Quantum Concepts
       </motion.h2>
@@ -324,7 +324,7 @@ const QuantumPage = () => (
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: i * 0.15 }}
-            className="flex flex-col items-center rounded-xl border border-cyan-500/20 bg-white/5 p-6 text-center backdrop-blur-sm transition-all duration-300 hover:border-cyan-400 hover:shadow-[0_0_30px_rgba(0,212,255,0.25)]"
+            className="flex flex-col items-center rounded-xl border border-orange-500/20 bg-white/5 p-6 text-center backdrop-blur-sm transition-all duration-300 hover:border-orange-400 hover:shadow-[0_0_30px_rgba(249,115,22,0.3)]"
           >
             {c.svg}
             <h3 className="mt-4 text-lg font-bold text-white">{c.title}</h3>
