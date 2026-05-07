@@ -37,6 +37,7 @@ const DrugPage = () => {
   transition={{ duration: 0.6 }}
   className="rounded-xl max-w-4xl w-full shadow-[0_0_40px_rgba(0,212,255,0.3)]"
 />
+      </div>
 
       {/* PIPELINE */}
       <section className="container mx-auto px-6 py-12 grid md:grid-cols-4 gap-6">
