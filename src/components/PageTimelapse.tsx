@@ -14,7 +14,7 @@ const PAGES = [
   { path: "/quantum", label: "Quantum" },
 ];
 
-const INTERVAL = 30000;
+const INTERVAL = 4000;
 
 const PageTimelapse = () => {
   const navigate = useNavigate();
