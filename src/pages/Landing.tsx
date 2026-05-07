@@ -104,9 +104,9 @@ const StatCard = ({ s, i }: { s: typeof stats[0]; i: number }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.7, delay: i * 0.15 }}
-      className="group rounded-xl border border-cyan-500/20 bg-white/5 p-6 text-center backdrop-blur-sm transition-all duration-300 hover:border-cyan-400 hover:shadow-[0_0_30px_rgba(0,212,255,0.25)]"
+      className="group rounded-xl border border-orange-500/20 bg-white/5 p-6 text-center backdrop-blur-sm transition-all duration-300 hover:border-orange-400 hover:shadow-[0_0_30px_rgba(249,115,22,0.3)]"
     >
-      <div className="bg-gradient-to-r from-purple-400 via-cyan-400 to-green-400 bg-clip-text text-4xl font-black text-transparent md:text-5xl">
+      <div className="bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400 bg-clip-text text-4xl font-black text-transparent md:text-5xl">
         {inView ? <CountUp end={s.value} duration={2} suffix={s.suffix} separator="," /> : `0${s.suffix}`}
       </div>
       <p className="mt-2 text-xs uppercase tracking-widest text-gray-400">{s.label}</p>
@@ -125,7 +125,7 @@ const Landing = () => {
         <div className="container mx-auto grid items-center gap-8 lg:grid-cols-2">
           <motion.div initial={{ opacity: 0, y: 60 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             {/* FIXED headline */}
-            <h1 className="bg-gradient-to-r from-purple-400 via-cyan-400 to-green-400 bg-clip-text text-5xl font-black leading-tight tracking-tight text-transparent md:text-6xl xl:text-7xl">
+            <h1 className="bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400 bg-clip-text text-5xl font-black leading-tight tracking-tight text-transparent md:text-6xl xl:text-7xl">
               Discover Tomorrow's Drugs with Quantum AI
             </h1>
             {/* FIXED subtext */}
@@ -168,7 +168,7 @@ const Landing = () => {
         <div className="container mx-auto">
           <motion.h2
             {...fadeUp}
-            className="mb-10 bg-gradient-to-r from-purple-400 via-cyan-400 to-green-400 bg-clip-text text-center text-3xl font-bold text-transparent md:text-4xl"
+            className="mb-10 bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400 bg-clip-text text-center text-3xl font-bold text-transparent md:text-4xl"
           >
             By the Numbers
           </motion.h2>
@@ -183,7 +183,7 @@ const Landing = () => {
         <div className="container mx-auto">
           <motion.h2
             {...fadeUp}
-            className="mb-12 bg-gradient-to-r from-purple-400 via-cyan-400 to-green-400 bg-clip-text text-center text-3xl font-bold text-transparent md:text-4xl"
+            className="mb-12 bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400 bg-clip-text text-center text-3xl font-bold text-transparent md:text-4xl"
           >
             How It Works
           </motion.h2>
@@ -195,7 +195,7 @@ const Landing = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.7, delay: i * 0.15 }}
-                className="relative rounded-xl border border-cyan-500/20 bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:border-cyan-400 hover:shadow-[0_0_30px_rgba(0,212,255,0.25)]"
+                className="relative rounded-xl border border-orange-500/20 bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:border-orange-400 hover:shadow-[0_0_30px_rgba(249,115,22,0.3)]"
               >
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 shadow-[0_0_20px_rgba(0,212,255,0.5)]">
                   <s.icon className="h-6 w-6 text-white" />
@@ -205,7 +205,7 @@ const Landing = () => {
                 <p className="text-sm text-gray-300">{s.desc}</p>
                 {i < steps.length - 1 && (
                   <div className="absolute top-1/2 right-0 hidden translate-x-1/2 md:block">
-                    <div className="relative h-px w-12 bg-gradient-to-r from-cyan-400 to-purple-500">
+                    <div className="relative h-px w-12 bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400">
                       <motion.div
                         className="absolute top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-cyan-400 shadow-[0_0_10px_#00d4ff]"
                         animate={{ left: ["0%", "100%"] }}
@@ -225,7 +225,7 @@ const Landing = () => {
         <div className="container mx-auto">
           <motion.h2
             {...fadeUp}
-            className="mb-12 bg-gradient-to-r from-purple-400 via-cyan-400 to-green-400 bg-clip-text text-center text-3xl font-bold text-transparent md:text-4xl"
+            className="mb-12 bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400 bg-clip-text text-center text-3xl font-bold text-transparent md:text-4xl"
           >
             Our Technology
           </motion.h2>
@@ -240,7 +240,7 @@ const Landing = () => {
                 className="group h-64 [perspective:1000px]"
               >
                 <div className="relative h-full w-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
-                  <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl border border-cyan-500/20 bg-white/5 p-6 text-center backdrop-blur-sm [backface-visibility:hidden]">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl border border-orange-500/20 bg-white/5 p-6 text-center backdrop-blur-sm [backface-visibility:hidden]">
                     <t.icon className="mb-4 h-12 w-12 text-cyan-400 drop-shadow-[0_0_15px_rgba(0,212,255,0.7)]" />
                     <h3 className="mb-2 text-lg font-bold text-white">{t.title}</h3>
                     <p className="text-sm text-gray-300">{t.desc}</p>
@@ -268,7 +268,7 @@ const Landing = () => {
         <div className="container mx-auto">
           <motion.h2
             {...fadeUp}
-            className="mb-12 bg-gradient-to-r from-purple-400 via-cyan-400 to-green-400 bg-clip-text text-center text-3xl font-bold text-transparent md:text-4xl"
+            className="mb-12 bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400 bg-clip-text text-center text-3xl font-bold text-transparent md:text-4xl"
           >
             Built With
           </motion.h2>
@@ -280,7 +280,7 @@ const Landing = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="flex items-center gap-4 rounded-xl border border-cyan-500/20 bg-white/5 p-4 backdrop-blur-sm transition-all duration-300 hover:border-cyan-400 hover:shadow-[0_0_20px_rgba(0,212,255,0.2)] hover:-translate-y-1"
+                className="flex items-center gap-4 rounded-xl border border-orange-500/20 bg-white/5 p-4 backdrop-blur-sm transition-all duration-300 hover:border-orange-400 hover:shadow-[0_0_30px_rgba(249,115,22,0.3)] hover:-translate-y-1"
               >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500/20 to-purple-600/20 border border-cyan-500/30">
                   <Layers className="h-5 w-5 text-cyan-400" />
@@ -300,7 +300,7 @@ const Landing = () => {
         <div className="container mx-auto">
           <motion.h2
             {...fadeUp}
-            className="mb-4 bg-gradient-to-r from-purple-400 via-cyan-400 to-green-400 bg-clip-text text-center text-3xl font-bold text-transparent md:text-4xl"
+            className="mb-4 bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400 bg-clip-text text-center text-3xl font-bold text-transparent md:text-4xl"
           >
             Training Data
           </motion.h2>
@@ -318,7 +318,7 @@ const Landing = () => {
                 className={`rounded-xl border ${d.border} bg-white/5 p-8 backdrop-blur-sm transition-all duration-300`}
                 whileHover={{ boxShadow: `0 0 40px ${d.glow}` }}
               >
-                <div className="bg-gradient-to-r from-purple-400 via-cyan-400 to-green-400 bg-clip-text text-5xl font-black text-transparent">
+                <div className="bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400 bg-clip-text text-5xl font-black text-transparent">
                   <CountUp end={parseInt(d.stat.replace(/\D/g, "")) || 2} duration={2} suffix={d.stat.replace(/[0-9,]/g, "")} separator="," />
                 </div>
                 <p className="mt-1 text-xs uppercase tracking-widest text-gray-400">{d.statLabel}</p>

@@ -20,11 +20,11 @@ const Navigation = () => {
   const navigate = useNavigate();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-cyan-500/20 bg-black/20 backdrop-blur-md">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-orange-500/20 bg-black/20 backdrop-blur-md">
       <div className="container mx-auto flex items-center justify-between px-4 py-3">
         <Link to="/" className="flex items-center gap-2">
           <Atom className="h-6 w-6 text-cyan-400" />
-          <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text font-mono text-sm font-bold tracking-wider text-transparent">
+          <span className="bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400 bg-clip-text font-mono text-sm font-bold tracking-wider text-transparent">
             QUANTA CURE
           </span>
         </Link>
@@ -73,7 +73,7 @@ const Navigation = () => {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden border-t border-cyan-500/20 bg-black/60 backdrop-blur-xl lg:hidden"
+            className="overflow-hidden border-t border-orange-500/20 bg-black/60 backdrop-blur-xl lg:hidden"
           >
             <div className="container mx-auto flex flex-col gap-1 px-4 py-3">
               {navItems.map((item) => (

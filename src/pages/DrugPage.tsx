@@ -18,7 +18,7 @@ const DrugPage = () => {
       <section className="pt-28 pb-16 text-center">
         <motion.h1
           {...fadeUp}
-          className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-400 via-cyan-400 to-green-400 bg-clip-text text-transparent"
+          className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-orange-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent"
         >
           Molecular Binding Affinity Predictor
         </motion.h1>
@@ -65,7 +65,7 @@ const DrugPage = () => {
           <motion.div
             key={i}
             {...fadeUp}
-            className="bg-white/5 p-6 rounded-xl border border-cyan-500/20 backdrop-blur-sm hover:shadow-[0_0_25px_rgba(0,212,255,0.3)] transition"
+            className="bg-white/5 p-6 rounded-xl border border-orange-500/20 backdrop-blur-sm hover:shadow-[0_0_30px_rgba(249,115,22,0.3)] transition"
           >
             <div className="text-cyan-400 mb-3">{step.icon}</div>
             <h3 className="text-lg font-semibold">{step.title}</h3>
